@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="../Meraki.Api/.editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="dotnet.config" />
+    <File Path="Halo.Api.dic" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="version.json" />
+  </Folder>
+  <Project Path="Halo.Api.Test/Halo.Api.Test.csproj" />
+  <Project Path="Halo.Api/Halo.Api.csproj" />
+</Solution>
