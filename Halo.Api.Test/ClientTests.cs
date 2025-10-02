@@ -24,8 +24,8 @@ public class ClientTests
 			HaloClientId = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
 			HaloClientSecret = "11111111-1111-1111-1111-111111111111-11111111-1111-1111-1111-111111111111"
 		});
-		act.Should().ThrowExactly<ArgumentException>()
-			.WithMessage("HaloClientId must be a valid GUID format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). (Parameter 'HaloClientId')");
+		act.Should().ThrowExactly<FormatException>()
+			.WithMessage("HaloClientId must be a valid GUID format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).");
 	}
 
 	[Fact]
@@ -102,7 +102,7 @@ public class ClientTests
 	}
 
 	[Fact]
-	public void CreateClient_InvalidHaloClientIdFormat_NoHyphens_ThrowsArgumentException()
+	public void CreateClient_InvalidHaloClientIdFormat_NoHyphens_ThrowsFormatException()
 	{
 		Action act = () => _ = new HaloClient(new HaloClientOptions
 		{
@@ -110,12 +110,12 @@ public class ClientTests
 			HaloClientId = "111111111111111111111111111111111111",
 			HaloClientSecret = "11111111-1111-1111-1111-111111111111-11111111-1111-1111-1111-111111111111"
 		});
-		act.Should().ThrowExactly<ArgumentException>()
-			.WithMessage("HaloClientId must be a valid GUID format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). (Parameter 'HaloClientId')");
+		act.Should().ThrowExactly<FormatException>()
+			.WithMessage("HaloClientId must be a valid GUID format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).");
 	}
 
 	[Fact]
-	public void CreateClient_InvalidHaloClientIdFormat_WrongLength_ThrowsArgumentException()
+	public void CreateClient_InvalidHaloClientIdFormat_WrongLength_ThrowsFormatException()
 	{
 		Action act = () => _ = new HaloClient(new HaloClientOptions
 		{
@@ -123,8 +123,8 @@ public class ClientTests
 			HaloClientId = "1111-1111-1111-1111-111111111111",
 			HaloClientSecret = "11111111-1111-1111-1111-111111111111-11111111-1111-1111-1111-111111111111"
 		});
-		act.Should().ThrowExactly<ArgumentException>()
-			.WithMessage("HaloClientId must be a valid GUID format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). (Parameter 'HaloClientId')");
+		act.Should().ThrowExactly<FormatException>()
+			.WithMessage("HaloClientId must be a valid GUID format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).");
 	}
 
 	[Fact]
@@ -154,7 +154,7 @@ public class ClientTests
 	}
 
 	[Fact]
-	public void CreateClient_InvalidHaloClientSecretFormat_SingleGuid_ThrowsArgumentException()
+	public void CreateClient_InvalidHaloClientSecretFormat_SingleGuid_ThrowsFormatException()
 	{
 		Action act = () => _ = new HaloClient(new HaloClientOptions
 		{
@@ -162,12 +162,12 @@ public class ClientTests
 			HaloClientId = "11111111-1111-1111-1111-111111111111",
 			HaloClientSecret = "11111111-1111-1111-1111-111111111111"
 		});
-		act.Should().ThrowExactly<ArgumentException>()
-			.WithMessage("HaloClientSecret must be in the format of two concatenated GUIDs (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). (Parameter 'HaloClientSecret')");
+		act.Should().ThrowExactly<FormatException>()
+			.WithMessage("HaloClientSecret must be in the format of two concatenated GUIDs (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).");
 	}
 
 	[Fact]
-	public void CreateClient_InvalidHaloClientSecretFormat_NoHyphens_ThrowsArgumentException()
+	public void CreateClient_InvalidHaloClientSecretFormat_NoHyphens_ThrowsFormatException()
 	{
 		Action act = () => _ = new HaloClient(new HaloClientOptions
 		{
@@ -175,8 +175,8 @@ public class ClientTests
 			HaloClientId = "11111111-1111-1111-1111-111111111111",
 			HaloClientSecret = "1111111111111111111111111111111111111111111111111111111111111111111111111111"
 		});
-		act.Should().ThrowExactly<ArgumentException>()
-			.WithMessage("HaloClientSecret must be in the format of two concatenated GUIDs (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). (Parameter 'HaloClientSecret')");
+		act.Should().ThrowExactly<FormatException>()
+			.WithMessage("HaloClientSecret must be in the format of two concatenated GUIDs (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).");
 	}
 
 	[Fact]
