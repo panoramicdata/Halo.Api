@@ -1,5 +1,4 @@
 using Halo.Api.Interfaces;
-using Microsoft.Extensions.Logging;
 
 namespace Halo.Api.Test;
 

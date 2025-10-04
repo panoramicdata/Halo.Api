@@ -7,7 +7,7 @@
 		<Nullable>enable</Nullable>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<WarningsAsErrors />
-		<WarningsNotAsErrors />
+		<WarningsNotAsErrors>VSSpell001</WarningsNotAsErrors>
 		<AnalysisLevel>latest-recommended</AnalysisLevel>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Authors>Panoramic Data Limited</Authors>
@@ -39,6 +39,12 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Refit" Version="7.2.22" />
+		<PackageReference Include="Refit.HttpClientFactory" Version="7.2.22" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+		<PackageReference Include="System.Text.Json" Version="9.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -48,6 +54,10 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="Halo.Api.Test" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<AdditionalFiles Include="CustomDictionary.xml" />
 	</ItemGroup>
 
 </Project>
