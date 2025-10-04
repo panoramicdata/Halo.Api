@@ -2,15 +2,52 @@
 
 	<PropertyGroup>
 		<TargetFramework>net9.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+		<WarningsNotAsErrors />
+		<AnalysisLevel>latest-recommended</AnalysisLevel>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Authors>Panoramic Data Limited</Authors>
+		<Copyright>Panoramic Data Limited 2025</Copyright>
+		<PackageProjectUrl>https://github.com/panoramicdata/HaloPSA.Api</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/panoramicdata/HaloPSA.Api</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<Description>Halo PSA API</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageTags>Halo PSA API</PackageTags>
+		<PackageReleaseNotes>Changelog can be found at https://github.com/panoramicdata/HaloPSA.Api/blob/main/CHANGELOG.md</PackageReleaseNotes>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<Company>Panoramic Data Limited</Company>
+		<Product>Panoramic Data Limited</Product>
+		<NeutralLanguage>en</NeutralLanguage>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Nerdbank.GitVersioning" Version="3.8.118">
-	    <PrivateAssets>all</PrivateAssets>
-	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	  </PackageReference>
+		<PackageReference Include="Nerdbank.GitVersioning" Version="3.8.118">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
+		<None Include="..\Icon.png" Pack="true" PackagePath="\" Condition="Exists('..\Icon.png')" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="Halo.Api.Test" />
 	</ItemGroup>
 
 </Project>

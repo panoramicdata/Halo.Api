@@ -1,12 +1,20 @@
 <Solution>
+  <Folder Name="/.github/">
+    <File Path="copilot-instructions.md" />
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path="../Meraki.Api/.editorconfig" />
+    <File Path=".github/copilot-instructions.md" />
     <File Path=".gitignore" />
     <File Path="dotnet.config" />
     <File Path="Halo.Api.dic" />
     <File Path="LICENSE" />
     <File Path="README.md" />
     <File Path="version.json" />
+  </Folder>
+  <Folder Name="/Specification/">
+    <File Path="Specification/ImplementationPlan.md" />
+    <File Path="Specification/swagger.json" />
   </Folder>
   <Project Path="Halo.Api.Test/Halo.Api.Test.csproj" />
   <Project Path="Halo.Api/Halo.Api.csproj" />

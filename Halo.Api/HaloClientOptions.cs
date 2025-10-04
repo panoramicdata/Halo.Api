@@ -1,17 +1,28 @@
-﻿
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace Halo.Api;
 
+/// <summary>
+/// Configuration options for the Halo API client
+/// </summary>
 public partial class HaloClientOptions
 {
 	private static readonly Regex _guidRegex = GetGuidRegex();
 	private static readonly Regex _haloClientSecretRegex = GetHaloClientSecretRegex();
 
+	/// <summary>
+	/// Gets or sets the Halo account identifier
+	/// </summary>
 	public required string HaloAccount { get; init; }
 
+	/// <summary>
+	/// Gets or sets the Halo client ID (must be in GUID format)
+	/// </summary>
 	public required string HaloClientId { get; init; }
 
+	/// <summary>
+	/// Gets or sets the Halo client secret (must be in the format of two concatenated GUIDs)
+	/// </summary>
 	public required string HaloClientSecret { get; init; }
 
 	internal void Validate()

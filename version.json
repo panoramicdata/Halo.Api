@@ -1,7 +1,7 @@
 {
-    "version": "2.196",
-    "publicReleaseRefSpec": [
-        "^refs/heads/main$",
-        "^refs/tags/1\\.\\d+.\\d+"
-    ]
+	"version": "2.196-alpha",
+	"publicReleaseRefSpec": [
+		"^refs/heads/main$",
+		"^refs/tags/1\\.\\d+.\\d+"
+	]
 }

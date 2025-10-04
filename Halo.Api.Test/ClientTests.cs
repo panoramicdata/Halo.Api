@@ -16,6 +16,41 @@ public class ClientTests
 	}
 
 	[Fact]
+	public void CreateClient_ValidCredentials_ExposesProperties()
+	{
+		// Arrange
+		var options = new HaloClientOptions
+		{
+			HaloAccount = "test-account",
+			HaloClientId = "22222222-2222-2222-2222-222222222222",
+			HaloClientSecret = "11111111-1111-1111-1111-111111111111-11111111-1111-1111-1111-111111111111"
+		};
+
+		// Act
+		var client = new HaloClient(options);
+
+		// Assert
+		client.Account.Should().Be("test-account");
+	}
+
+	[Fact]
+	public void HaloClientOptions_Properties_ReturnExpectedValues()
+	{
+		// Arrange & Act
+		var options = new HaloClientOptions
+		{
+			HaloAccount = "my-account",
+			HaloClientId = "33333333-3333-3333-3333-333333333333",
+			HaloClientSecret = "44444444-4444-4444-4444-444444444444-55555555-5555-5555-5555-555555555555"
+		};
+
+		// Assert
+		options.HaloAccount.Should().Be("my-account");
+		options.HaloClientId.Should().Be("33333333-3333-3333-3333-333333333333");
+		options.HaloClientSecret.Should().Be("44444444-4444-4444-4444-444444444444-55555555-5555-5555-5555-555555555555");
+	}
+
+	[Fact]
 	public void CreateClient_InvalidClientId_Throws()
 	{
 		Action act = () => _ = new HaloClient(new HaloClientOptions
