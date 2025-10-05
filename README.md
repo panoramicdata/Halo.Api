@@ -17,7 +17,7 @@ A comprehensive, modern .NET library for interacting with the [Halo PSA](https:/
 ## Features
 
 - 🎯 **Complete API Coverage** - Full support for all Halo PSA endpoints
-- 🚀 **Modern .NET** - Built for .NET 9+ with modern C# features
+- 🚀 **Modern .NET** - Built for .NET 9 with modern C# features
 - 🔒 **Type Safety** - Strongly typed models and responses
 - 📝 **Comprehensive Logging** - Built-in logging and request/response interception
 - 🔄 **Retry Logic** - Automatic retry with exponential backoff

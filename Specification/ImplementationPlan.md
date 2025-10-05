@@ -11,7 +11,7 @@
 
 **Technology Stack**:
 - Refit for HTTP client generation
-- .NET 9/.NET 10 target frameworks
+- .NET 9 target framework
 - Modern C# patterns (primary constructors, collection expressions, etc.)
 - Microsoft Testing Platform for testing
 - Nerdbank.GitVersioning for semantic versioning
@@ -238,7 +238,7 @@ git push origin v1.0.0
 
 **Package Details**:
 - **Package ID**: `HaloPsa.Api`
-- **Target Frameworks**: .NET 9.0, .NET 10.0
+- **Target Frameworks**: .NET 9.0
 - **Author**: Panoramic Data Limited
 - **License**: MIT
 - **Repository**: https://github.com/panoramicdata/HaloPSA.Api
