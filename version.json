@@ -2,6 +2,6 @@
 	"version": "2.196",
 	"publicReleaseRefSpec": [
 		"^refs/heads/main$",
-		"^refs/tags/1\\.\\d+.\\d+"
+		"^refs/tags/2\\.\\d+.\\d+"
 	]
 }
