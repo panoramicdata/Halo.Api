@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions
+﻿# GitHub Copilot Instructions
 
 ## Code Style Guidelines
 
@@ -59,14 +59,14 @@ public class HaloClientOptions
 - Always use file-scoped namespaces:
 ```csharp
 // Preferred
-namespace Halo.Api;
+namespace HaloPsa.Api;
 
 public class HaloClient
 {
 }
 
 // Instead of
-namespace Halo.Api
+namespace HaloPsa.Api
 {
     public class HaloClient
     {
@@ -172,12 +172,12 @@ public record HaloApiResponse(string Data, int StatusCode, DateTime Timestamp);
 ### Halo PSA API Library Structure
 
 #### Project Organization
-- **Main Library**: `Halo.Api` (targets .NET 9)
+- **Main Library**: `HaloPsa.Api` (targets .NET 9/.NET 10)
   - Core client classes and interfaces
   - API models and DTOs (to be generated from OpenAPI spec)
   - Authentication and configuration
   
-- **Test Project**: `Halo.Api.Test` (targets .NET 10)
+- **Test Project**: `HaloPsa.Api.Test` (targets .NET 10)
   - Unit tests with AwesomeAssertions
   - Integration tests using Microsoft Testing Platform
   - Uses User Secrets for sensitive configuration
@@ -279,9 +279,9 @@ internal void Validate()
 ## Ongoing Development Guidelines
 
 ### Implementation Plan Reference
-- **?? Implementation Plan**: See `Specification/ImplementationPlan.md` for the complete phased development approach
-- **?? Current Focus**: Check the "Current Phase" section in the implementation plan
-- **?? Progress Tracking**: Update the implementation plan as each phase/milestone is completed
+- **📋 Implementation Plan**: See `Specification/ImplementationPlan.md` for the complete phased development approach
+- **🎯 Current Focus**: Check the "Current Phase" section in the implementation plan
+- **📊 Progress Tracking**: Update the implementation plan as each phase/milestone is completed
 
 ### Development Workflow
 1. **Always reference the implementation plan** before starting new work

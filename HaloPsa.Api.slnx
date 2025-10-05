@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/.github/">
+    <File Path="copilot-instructions.md" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/copilot-instructions.md" />
+    <File Path=".gitignore" />
+    <File Path="dotnet.config" />
+    <File Path="HaloPsa.Api.dic" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="version.json" />
+  </Folder>
+  <Folder Name="/Specification/">
+    <File Path="Specification/ImplementationPlan.md" />
+    <File Path="Specification/swagger.json" />
+  </Folder>
+  <Project Path="HaloPsa.Api.Test/HaloPsa.Api.Test.csproj" />
+  <Project Path="HaloPsa.Api/HaloPsa.Api.csproj" />
+</Solution>

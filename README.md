@@ -1,8 +1,8 @@
 ﻿# Halo PSA API .NET Library
 
-[![NuGet Version](https://img.shields.io/nuget/v/Halo.Api)](https://www.nuget.org/packages/Halo.Api)
-[![NuGet Downloads](https://img.shields.io/nuget/dt/Halo.Api)](https://www.nuget.org/packages/Halo.Api)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/panoramicdata/HaloPSA.Api/build.yml)](https://github.com/panoramicdata/HaloPSA.Api/actions)
+[![NuGet Version](https://img.shields.io/nuget/v/HaloPsa.Api)](https://www.nuget.org/packages/HaloPsa.Api)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/HaloPsa.Api)](https://www.nuget.org/packages/HaloPsa.Api)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/panoramicdata/HaloPSA.Api/build.yml)](https://github.com/panoramicdata/HaloPsa.Api/actions)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/a6c135d1c93d4d818e770f149385a149)](https://app.codacy.com/gh/panoramicdata/Halo.Api/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -11,7 +11,7 @@ A comprehensive, modern .NET library for interacting with the [Halo PSA](https:/
 ## 📚 Official Documentation
 
 - **API Documentation**: [https://halo.haloservicedesk.com/apidoc/info](https://halo.haloservicedesk.com/apidoc/info)
-- **Authentication Guide**: [https://halo.haloservicedesk.com/apidoc/authentication/password](https://halo.haloservicedesk.com/apidoc/authentication/password)
+- **Authentication Guide**: [https://halo.haloservicedesk.com/apidoc/authentication/clientcredentials](https://halo.haloservicedesk.com/apidoc/authentication/clientcredentials)
 - **Halo PSA Official Site**: [https://haloservicedesk.com/halopsa](https://haloservicedesk.com/halopsa)
 
 ## Features
@@ -30,39 +30,45 @@ A comprehensive, modern .NET library for interacting with the [Halo PSA](https:/
 Install the package via NuGet Package Manager:
 
 ```bash
-dotnet add package Halo.Api
+dotnet add package HaloPsa.Api
 ```
 
 Or via Package Manager Console:
 
 ```powershell
-Install-Package Halo.Api
+Install-Package HaloPsa.Api
 ```
 
 ## Quick Start
 
 ### 1. Authentication Setup
 
-Halo API uses **password-based authentication** with agent credentials. You'll need:
+Halo API uses **OAuth2 Client Credentials flow** for authentication. You'll need:
 
 1. **Halo Account Name** - Your instance identifier (e.g., "yourcompany" for "yourcompany.halopsa.com")
 2. **Client ID** - Your application's registered client ID (GUID format)
-3. **Username** - A Halo agent's username with API permissions
-4. **Password** - The agent's password
-5. **Tenant** - For hosted solutions, typically "Halo" (optional for on-premise)
+3. **Client Secret** - Your application's client secret (two concatenated GUIDs)
 
-Refer to the [official authentication documentation](https://halo.haloservicedesk.com/apidoc/authentication/password) for detailed guidance on obtaining these credentials.
+Refer to the [official authentication documentation](https://halo.haloservicedesk.com/apidoc/authentication/clientcredentials) for detailed guidance on obtaining these credentials.
+
+#### Creating API Credentials in Halo
+1. Log into your Halo instance as an administrator
+2. Navigate to **Configuration** → **Integrations** → **Halo API**
+3. Click **New** to create a new API application
+4. Configure the application settings:
+   - **Application Name**: Your application name
+   - **Authentication Method**: Client Credentials
+   - **Permissions**: Select appropriate scopes for your use case
+5. Save the application to generate your **Client ID** and **Client Secret**
 
 ```csharp
-using Halo.Api;
+using HaloPsa.Api;
 
 var options = new HaloClientOptions
 {
-    HaloAccount = "your-account-name",      // e.g., "yourcompany" 
-    HaloClientId = "your-client-id-guid",   // Application client ID
-    HaloUsername = "agent-username",        // Halo agent username
-    HaloPassword = "agent-password",        // Halo agent password
-    Tenant = "Halo"                        // For hosted solutions (optional)
+    HaloAccount = "your-account-name",        // e.g., "yourcompany" 
+    HaloClientId = "your-client-id-guid",     // Generated Client ID (GUID)
+    HaloClientSecret = "your-client-secret"   // Generated Client Secret (two concatenated GUIDs)
 };
 
 var client = new HaloClient(options);
@@ -101,7 +107,7 @@ Console.WriteLine($"Assigned to: {ticket.AssignedAgent?.Name}");
 var newTicket = new CreateTicketRequest
 {
     Summary = "New ticket from API",
-    Details = "This ticket was created using the Halo.Api library",
+    Details = "This ticket was created using the HaloPsa.Api library",
     ClientId = 123,
     UserId = 456,
     TicketTypeId = 1
@@ -166,8 +172,7 @@ var options = new HaloClientOptions
 {
     HaloAccount = "your-account",
     HaloClientId = "your-client-id",
-    HaloUsername = "your-username",
-    HaloPassword = "your-password",
+    HaloClientSecret = "your-client-secret",
     
     // Custom timeout
     RequestTimeout = TimeSpan.FromSeconds(30),
@@ -177,10 +182,7 @@ var options = new HaloClientOptions
     RetryDelay = TimeSpan.FromSeconds(1),
     
     // Custom base URL (if using on-premises)
-    BaseUrl = "https://your-instance.halopsa.com",
-    
-    // Custom scope (default is "all")
-    Scope = "tickets users clients"
+    BaseUrl = "https://your-instance.halopsa.com"
 };
 
 var client = new HaloClient(options);
@@ -214,11 +216,13 @@ var client = new HaloClient(options);
 
 If you're experiencing authentication issues:
 
-1. **Verify Credentials**: Ensure the username/password can log into the Halo web interface
-2. **Check API Permissions**: The user account must have API access permissions in Halo
-3. **Validate Client ID**: Ensure your application is registered in Halo with the correct client ID
-4. **Tenant Parameter**: For hosted solutions, include the `Tenant = "Halo"` parameter
-5. **On-Premise vs Hosted**: On-premise installations may not require the tenant parameter
+1. **Verify Client Credentials**: Ensure your Client ID and Client Secret are correct and haven't been regenerated
+2. **Check API Application Status**: Verify the API application is enabled in Halo Configuration
+3. **Validate Client ID Format**: Ensure the Client ID is a valid GUID format
+4. **Validate Client Secret Format**: Ensure the Client Secret is in the correct format (two concatenated GUIDs)
+5. **Check Permissions**: Verify your API application has the necessary permissions/scopes
+6. **Network Connectivity**: Ensure your application can reach the Halo API endpoints
+7. **On-Premise vs Cloud**: On-premise installations may require custom BaseUrl configuration
 
 ### 5. Pagination and Large Result Sets
 
@@ -305,12 +309,7 @@ public class HaloClientOptions
     // Required authentication
     public required string HaloAccount { get; init; }
     public required string HaloClientId { get; init; }
-    public required string HaloUsername { get; init; }
-    public required string HaloPassword { get; init; }
-    
-    // Optional authentication
-    public string? Tenant { get; init; } = null;  // For hosted solutions
-    public string? Scope { get; init; } = "all";  // API permissions scope
+    public required string HaloClientSecret { get; init; }
     
     // Optional configuration
     public string? BaseUrl { get; init; } = null;  // Uses default Halo cloud URL
@@ -323,6 +322,8 @@ public class HaloClientOptions
     public bool EnableRequestLogging { get; init; } = false;
     public bool EnableResponseLogging { get; init; } = false;
     public Dictionary<string, string> DefaultHeaders { get; init; } = [];
+    public bool UseExponentialBackoff { get; init; } = true;
+    public TimeSpan MaxRetryDelay { get; init; } = TimeSpan.FromSeconds(30);
 }
 ```
 
@@ -331,7 +332,7 @@ public class HaloClientOptions
 For detailed API endpoint documentation, parameters, and response formats, please refer to the official resources:
 
 - 📖 **[Halo API Documentation](https://halo.haloservicedesk.com/apidoc/info)** - Complete API reference
-- 🔐 **[Authentication Guide](https://halo.haloservicedesk.com/apidoc/authentication/password)** - How to obtain and use API credentials
+- 🔐 **[Authentication Guide](https://halo.haloservicedesk.com/apidoc/authentication/clientcredentials)** - How to obtain and use API credentials
 - 🌐 **[Halo Service Desk](https://haloservicedesk.com/)** - Official product documentation
 
 ## Contributing
@@ -355,9 +356,7 @@ We welcome contributions from the community! Here's how you can help:
    dotnet user-secrets init
    dotnet user-secrets set "HaloApi:HaloAccount" "your-test-account"
    dotnet user-secrets set "HaloApi:HaloClientId" "your-test-client-id"
-   dotnet user-secrets set "HaloApi:HaloUsername" "your-test-username"
-   dotnet user-secrets set "HaloApi:HaloPassword" "your-test-password"
-   dotnet user-secrets set "HaloApi:Tenant" "Halo"
+   dotnet user-secrets set "HaloApi:HaloClientSecret" "your-test-client-secret"
    ```
 
 4. **Build and test**:
