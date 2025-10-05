@@ -16,15 +16,12 @@ internal sealed class PsaApi(HttpClient _httpClient) : IPsaApi
 		ExceptionFactory = ConvertApiExceptionToHaloApiException
 	};
 
-	public ITicketsApi Tickets { get; } = new Lazy<ITicketsApi>(() => RestService.For<ITicketsApi>(_httpClient, _refitSettings)).Value;
-	public ITicketTypesApi TicketTypes { get; } = new Lazy<ITicketTypesApi>(() => new TicketTypesApiWrapper(RestService.For<ITicketTypesRefitApi>(_httpClient, _refitSettings))).Value;
-	public IUsersApi Users { get; } = new Lazy<IUsersApi>(() => new UsersApiWrapper(RestService.For<IUsersRefitApi>(_httpClient, _refitSettings))).Value;
-	public IClientsApi Clients { get; } = new Lazy<IClientsApi>(() => new ClientsApiWrapper(RestService.For<IClientsRefitApi>(_httpClient, _refitSettings))).Value;
-	public IActionsApi Actions { get; } = new Lazy<IActionsApi>(() => new ActionsApi(_httpClient)).Value;
-	public IAttachmentsApi Attachments => new AttachmentsApi(_httpClient);
-	public IAssetsApi Assets { get; } = new Lazy<IAssetsApi>(() => new AssetsApiWrapper(RestService.For<IAssetsRefitApi>(_httpClient, _refitSettings))).Value;
-	public IProjectsApi Projects { get; } = new Lazy<IProjectsApi>(() => new ProjectsApiWrapper(RestService.For<IProjectsRefitApi>(_httpClient, _refitSettings))).Value;
-	public IReportsApi Reports => new ReportsApi(_httpClient);
+	public TicketsApiWrapper Tickets { get; } = new Lazy<TicketsApiWrapper>(() => new TicketsApiWrapper(RestService.For<ITicketsApi>(_httpClient, _refitSettings))).Value;
+	public TicketTypesApiWrapper TicketTypes { get; } = new Lazy<TicketTypesApiWrapper>(() => new TicketTypesApiWrapper(RestService.For<ITicketTypesRefitApi>(_httpClient, _refitSettings))).Value;
+	public UsersApiWrapper Users { get; } = new Lazy<UsersApiWrapper>(() => new UsersApiWrapper(RestService.For<IUsersRefitApi>(_httpClient, _refitSettings))).Value;
+	public ClientsApiWrapper Clients { get; } = new Lazy<ClientsApiWrapper>(() => new ClientsApiWrapper(RestService.For<IClientsRefitApi>(_httpClient, _refitSettings))).Value;
+	public AssetsApiWrapper Assets { get; } = new Lazy<AssetsApiWrapper>(() => new AssetsApiWrapper(RestService.For<IAssetsRefitApi>(_httpClient, _refitSettings))).Value;
+	public ProjectsApiWrapper Projects { get; } = new Lazy<ProjectsApiWrapper>(() => new ProjectsApiWrapper(RestService.For<IProjectsRefitApi>(_httpClient, _refitSettings))).Value;
 
 	/// <summary>
 	/// Converts Refit ApiExceptions to appropriate HaloApiExceptions
@@ -55,7 +52,7 @@ internal sealed class PsaApi(HttpClient _httpClient) : IPsaApi
 			{
 				var jsonDoc = JsonDocument.Parse(content);
 				details = ExtractErrorDetails(jsonDoc.RootElement);
-				
+
 				// Extract validation errors if present
 				if (jsonDoc.RootElement.TryGetProperty("errors", out var errorsElement))
 				{
@@ -70,6 +67,7 @@ internal sealed class PsaApi(HttpClient _httpClient) : IPsaApi
 							}
 						}
 					}
+
 					validationErrors = errorsList.AsReadOnly();
 				}
 			}
@@ -174,7 +172,7 @@ internal sealed class PsaApi(HttpClient _httpClient) : IPsaApi
 
 		var uri = new Uri(url);
 		var segments = uri.Segments;
-		
+
 		// Look for /api/{resourceType} pattern
 		for (int i = 0; i < segments.Length - 1; i++)
 		{
@@ -199,7 +197,7 @@ internal sealed class PsaApi(HttpClient _httpClient) : IPsaApi
 
 		var uri = new Uri(url);
 		var segments = uri.Segments;
-		
+
 		// Look for /api/{resourceType}/{id} pattern
 		for (int i = 0; i < segments.Length - 2; i++)
 		{
@@ -210,6 +208,7 @@ internal sealed class PsaApi(HttpClient _httpClient) : IPsaApi
 				{
 					return intId;
 				}
+
 				return idSegment;
 			}
 		}

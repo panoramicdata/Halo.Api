@@ -6,7 +6,7 @@ namespace Halo.Api.Infrastructure;
 /// <summary>
 /// Wrapper for Clients API that provides both raw responses and convenient array access
 /// </summary>
-internal sealed class ClientsApiWrapper(IClientsRefitApi clientsRefitApi) : IClientsApi
+public class ClientsApiWrapper(IClientsRefitApi clientsRefitApi) : IClientsApi
 {
 	/// <summary>
 	/// Get all clients - Returns unwrapped array for convenience

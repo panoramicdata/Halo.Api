@@ -6,7 +6,7 @@ namespace Halo.Api.Infrastructure;
 /// <summary>
 /// Wrapper for Assets API that provides both raw responses and convenient array access
 /// </summary>
-internal sealed class AssetsApiWrapper(IAssetsRefitApi assetsRefitApi) : IAssetsApi
+public class AssetsApiWrapper(IAssetsRefitApi assetsRefitApi) : IAssetsApi
 {
 	/// <summary>
 	/// Get all assets - Returns unwrapped array for convenience
@@ -23,5 +23,13 @@ internal sealed class AssetsApiWrapper(IAssetsRefitApi assetsRefitApi) : IAssets
 	public async Task<AssetsResponse> GetResponseAsync(CancellationToken cancellationToken)
 	{
 		return await assetsRefitApi.GetResponseAsync(cancellationToken);
+	}
+
+	/// <summary>
+	/// Get an asset by ID
+	/// </summary>
+	public async Task<Asset> GetByIdAsync(int id, CancellationToken cancellationToken)
+	{
+		return await assetsRefitApi.GetByIdAsync(id, cancellationToken);
 	}
 }

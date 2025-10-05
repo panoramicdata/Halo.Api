@@ -6,7 +6,7 @@ namespace Halo.Api.Infrastructure;
 /// <summary>
 /// Wrapper for Users API that provides both raw responses and convenient array access
 /// </summary>
-internal sealed class UsersApiWrapper(IUsersRefitApi usersRefitApi) : IUsersApi
+public class UsersApiWrapper(IUsersRefitApi usersRefitApi) : IUsersApi
 {
 	/// <summary>
 	/// Get all users - Returns unwrapped array for convenience
@@ -23,5 +23,13 @@ internal sealed class UsersApiWrapper(IUsersRefitApi usersRefitApi) : IUsersApi
 	public async Task<UsersResponse> GetResponseAsync(CancellationToken cancellationToken)
 	{
 		return await usersRefitApi.GetResponseAsync(cancellationToken);
+	}
+
+	/// <summary>
+	/// Get a user by ID
+	/// </summary>
+	public async Task<User> GetByIdAsync(int id, CancellationToken cancellationToken)
+	{
+		return await usersRefitApi.GetByIdAsync(id, cancellationToken);
 	}
 }

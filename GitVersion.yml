@@ -1,0 +1,89 @@
+{
+  "$schema": "https://raw.githubusercontent.com/GitTools/GitVersion/main/schemas/GitVersion.configuration.json",
+  "mode": "Mainline",
+  "tag-prefix": "v",
+  "major-version-bump-message": "^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\\(.+\\))?(!:|:.*\\n\\n((.+\\n)+\\n)?BREAKING CHANGE)",
+  "minor-version-bump-message": "^(feat)(\\(.+\\))?:",
+  "patch-version-bump-message": "^(build|chore|ci|docs|fix|perf|refactor|revert|style|test)(\\(.+\\))?:",
+  "no-bump-message": "^(docs|test|refactor)",
+  "legacy-semver-padding": 4,
+  "build-metadata-padding": 4,
+  "commits-since-version-source-padding": 4,
+  "tag-pre-release-weight": 60000,
+  "commit-message-incrementing": "Enabled",
+  "branches": {
+    "main": {
+      "mode": "ContinuousDelivery",
+      "tag": "",
+      "increment": "Patch",
+      "prevent-increment-of-merged-branch-version": false,
+      "track-merge-target": false,
+      "regex": "^master$|^main$",
+      "source-branches": ["develop", "release"]
+    },
+    "develop": {
+      "mode": "ContinuousDeployment",
+      "tag": "alpha",
+      "increment": "Minor",
+      "prevent-increment-of-merged-branch-version": false,
+      "track-merge-target": true,
+      "regex": "^dev(elop)?(ment)?$",
+      "source-branches": []
+    },
+    "release": {
+      "mode": "ContinuousDelivery",
+      "tag": "beta",
+      "increment": "None",
+      "prevent-increment-of-merged-branch-version": true,
+      "track-merge-target": false,
+      "regex": "^releases?[/-]",
+      "source-branches": ["develop", "main", "support", "release"]
+    },
+    "feature": {
+      "mode": "ContinuousDeployment",
+      "tag": "feature",
+      "increment": "Inherit",
+      "prevent-increment-of-merged-branch-version": false,
+      "track-merge-target": false,
+      "regex": "^features?[/-]",
+      "source-branches": ["develop", "main", "release", "feature", "support", "hotfix"]
+    },
+    "pull-request": {
+      "mode": "ContinuousDeployment",
+      "tag": "PullRequest",
+      "increment": "Inherit",
+      "prevent-increment-of-merged-branch-version": false,
+      "tag-number-pattern": "[/-](?<number>\\d+)[-/]",
+      "track-merge-target": false,
+      "regex": "^(pull|pull\\-requests|pr)[/-]",
+      "source-branches": ["develop", "main", "release", "feature", "support", "hotfix"]
+    },
+    "hotfix": {
+      "mode": "ContinuousDeployment",
+      "tag": "hotfix",
+      "increment": "Patch",
+      "prevent-increment-of-merged-branch-version": false,
+      "track-merge-target": false,
+      "regex": "^hotfix(es)?[/-]",
+      "source-branches": ["develop", "main", "support"]
+    },
+    "support": {
+      "mode": "ContinuousDelivery",
+      "tag": "",
+      "increment": "Patch",
+      "prevent-increment-of-merged-branch-version": true,
+      "track-merge-target": false,
+      "regex": "^support[/-]",
+      "source-branches": ["main"]
+    }
+  },
+  "ignore": {
+    "sha": []
+  },
+  "merge-message-formats": {},
+  "increment": "Inherit",
+  "prevent-increment-of-merged-branch-version": false,
+  "tag-number-pattern": "[/-](?<number>\\d+)[-/]",
+  "track-merge-target": false,
+  "commit-date-format": "yyyy-MM-dd"
+}

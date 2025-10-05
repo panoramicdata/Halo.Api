@@ -1,52 +1,39 @@
+using Halo.Api.Infrastructure;
+
 namespace Halo.Api.Interfaces;
 
 /// <summary>
-/// Interface for PSA (Professional Services Automation) API operations
+/// Interface for PSA (Professional Services Automation) operations in Halo
 /// </summary>
 public interface IPsaApi
 {
 	/// <summary>
 	/// Gets the Tickets API for ticket management operations
 	/// </summary>
-	ITicketsApi Tickets { get; }
+	TicketsApiWrapper Tickets { get; }
 
 	/// <summary>
-	/// Gets the TicketTypes API for ticket type management operations
+	/// Gets the TicketTypes API for ticket type operations
 	/// </summary>
-	ITicketTypesApi TicketTypes { get; }
+	TicketTypesApiWrapper TicketTypes { get; }
 
 	/// <summary>
 	/// Gets the Users API for user management operations
 	/// </summary>
-	IUsersApi Users { get; }
+	UsersApiWrapper Users { get; }
 
 	/// <summary>
 	/// Gets the Clients API for client management operations
 	/// </summary>
-	IClientsApi Clients { get; }
-
-	/// <summary>
-	/// Gets the Actions API for ticket action operations
-	/// </summary>
-	IActionsApi Actions { get; }
-
-	/// <summary>
-	/// Gets the Attachments API for file attachment operations
-	/// </summary>
-	IAttachmentsApi Attachments { get; }
+	ClientsApiWrapper Clients { get; }
 
 	/// <summary>
 	/// Gets the Assets API for asset management operations
 	/// </summary>
-	IAssetsApi Assets { get; }
+	AssetsApiWrapper Assets { get; }
 
 	/// <summary>
 	/// Gets the Projects API for project management operations
 	/// </summary>
-	IProjectsApi Projects { get; }
-
-	/// <summary>
-	/// Gets the Reports API for reporting and analytics operations
-	/// </summary>
-	IReportsApi Reports { get; }
+	ProjectsApiWrapper Projects { get; }
 }

@@ -1,6 +1,7 @@
 ﻿using Halo.Api.Infrastructure;
 using Halo.Api.Interfaces;
 using Microsoft.Extensions.Logging.Abstractions;
+using Refit;
 
 namespace Halo.Api;
 

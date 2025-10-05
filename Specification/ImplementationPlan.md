@@ -192,6 +192,94 @@ await client.ServiceDesk.Approvals.GetAllAsync(cancellationToken);
 
 ---
 
+## 🚀 **CI/CD Pipeline & NuGet Publishing**
+
+### **Automated Publishing Workflow**
+
+**Trigger**: Git tags starting with `v` (e.g., `v1.0.0`, `v2.1.3-beta`)
+
+**GitHub Actions Pipeline**:
+1. ✅ **Build Verification**: Solution builds with zero warnings
+2. ✅ **Test Execution**: All tests must pass (100% success rate requirement)
+3. ✅ **NuGet Packaging**: Creates optimized release package
+4. ✅ **NuGet Publishing**: Automatically publishes to NuGet.org
+5. ✅ **GitHub Release**: Creates release with package download links
+
+### **Publishing Process**
+
+#### **Method 1: PowerShell Script (Recommended)**
+```powershell
+# Run comprehensive publish process
+.\Publish.ps1
+
+# Specify version directly
+.\Publish.ps1 -Version "1.2.0"
+
+# Dry run to test process
+.\Publish.ps1 -Version "1.2.0" -DryRun
+```
+
+**Script Features**:
+- ✅ **Pre-flight checks**: Git status, .NET version validation
+- ✅ **Build verification**: Clean build with zero warnings
+- ✅ **Test execution**: 100% test success rate validation
+- ✅ **Version management**: Semantic versioning with validation
+- ✅ **Tag creation**: Automated git tagging with CI/CD trigger
+- ✅ **Status monitoring**: Direct links to GitHub Actions progress
+
+#### **Method 2: Manual Tagging**
+```bash
+# Create and push version tag
+git tag -a v1.0.0 -m "Release 1.0.0"
+git push origin v1.0.0
+```
+
+### **NuGet Package Configuration**
+
+**Package Details**:
+- **Package ID**: `Halo.Api`
+- **Target Frameworks**: .NET 9.0, .NET 10.0
+- **Author**: Panoramic Data Limited
+- **License**: MIT
+- **Repository**: https://github.com/panoramicdata/HaloPSA.Api
+
+**Package Features**:
+- ✅ **Source Link**: Full source debugging support
+- ✅ **Symbol Packages**: `.snupkg` files for debugging
+- ✅ **XML Documentation**: IntelliSense support
+- ✅ **README Integration**: Package description from repository
+- ✅ **GitVersioning**: Automated semantic versioning
+
+### **Installation & Usage**
+
+```bash
+# Install latest stable version
+dotnet add package Halo.Api
+
+# Install specific version
+dotnet add package Halo.Api --version 1.2.0
+
+# Install pre-release version
+dotnet add package Halo.Api --version 2.0.0-beta --prerelease
+```
+
+```csharp
+// Basic usage after installation
+var client = new HaloClient(new HaloClientOptions
+{
+    HaloAccount = "your-account",
+    HaloClientId = "your-client-id", 
+    HaloClientSecret = "your-client-secret"
+});
+
+// Use PSA APIs with full CRUD support
+var tickets = await client.Psa.Tickets.GetAllAsync(cancellationToken);
+var users = await client.Psa.Users.GetAllAsync(cancellationToken);
+var clients = await client.Psa.Clients.GetAllAsync(cancellationToken);
+```
+
+---
+
 ## Success Criteria Status
 
 1. ✅ **Authentication Working**: OAuth2 authentication flow successful
@@ -201,6 +289,8 @@ await client.ServiceDesk.Approvals.GetAllAsync(cancellationToken);
 5. ✅ **Zero Warnings**: Clean compilation across all projects
 6. ✅ **CRUD Ready**: Full Create/Read/Update/Delete operations working
 7. ✅ **Production Ready**: PSA module ready for production deployment
+8. ✅ **CI/CD Pipeline**: Automated build, test, and publish workflow
+9. ✅ **NuGet Publishing**: Automated package publishing to NuGet.org
 
 ## 🏆 **MAJOR MILESTONE: 100% TEST SUCCESS ACHIEVED**
 

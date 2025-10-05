@@ -48,7 +48,7 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		// Find a client that actually has tickets in the sandbox
 		var clientsWithTickets = allTickets.Tickets
 			.GroupBy(t => t.ClientId)
-			.Where(g => g.Count() > 0)
+			.Where(g => g.Any())
 			.Select(g => g.Key)
 			.ToList();
 
@@ -73,7 +73,7 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 
 			// Check if at least some tickets match the expected client (sandbox filter might be loose)
 			var matchingTickets = result.Tickets.Count(t => t.ClientId == clientId);
-			matchingTickets.Should().BeGreaterThan(0, $"Expected at least some tickets to match client ID {clientId}");
+			matchingTickets.Should().BePositive($"Expected at least some tickets to match client ID {clientId}");
 		}
 	}
 
@@ -136,7 +136,7 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		var tickets = await HaloClient.Psa.Tickets.GetAllAsync(CancellationToken);
 		tickets.Tickets.Should().NotBeEmpty("Need at least one ticket to test GetById");
 
-		var ticketId = tickets.Tickets.First().Id;
+		var ticketId = tickets.Tickets[0].Id;
 
 		// Act
 		var result = await HaloClient.Psa.Tickets.GetByIdAsync(ticketId, CancellationToken);
@@ -163,13 +163,13 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		// Arrange - Get real client and user data first (dynamic discovery pattern!)
 		var clients = await HaloClient.Psa.Clients.GetAllAsync(CancellationToken);
 		clients.Should().NotBeEmpty("Need at least one client to test ticket creation");
-		
+
 		var users = await HaloClient.Psa.Users.GetAllAsync(CancellationToken);
 		users.Should().NotBeEmpty("Need at least one user to test ticket creation");
-		
-		var validClientId = clients.First().Id;
-		var validUserId = users.First().Id;
-		
+
+		var validClientId = clients[0].Id;
+		var validUserId = users[0].Id;
+
 		var request = new CreateTicketRequest
 		{
 			Summary = $"API Test Ticket - {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}",
@@ -181,19 +181,19 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 
 		// Act & Assert - Test how the endpoint behaves in this environment
 		var act = async () => await HaloClient.Psa.Tickets.CreateAsync(request, CancellationToken);
-		
+
 		// We don't know if this sandbox allows creation, so test graceful handling
 		try
 		{
 			var result = await HaloClient.Psa.Tickets.CreateAsync(request, CancellationToken);
-			
+
 			// If creation succeeds, verify the response structure
 			result.Should().NotBeNull();
 			result.Ticket.Should().NotBeNull();
 			result.Ticket.Id.Should().BePositive();
 			result.Ticket.Summary.Should().Be(request.Summary);
 			result.Ticket.ClientId.Should().Be(request.ClientId);
-			
+
 			// Clean up the created ticket if possible
 			try
 			{
@@ -234,10 +234,10 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		// Arrange - Get a real ticket first (dynamic discovery pattern!)
 		var tickets = await HaloClient.Psa.Tickets.GetAllAsync(CancellationToken);
 		tickets.Tickets.Should().NotBeEmpty("Need at least one ticket to test update");
-		
-		var ticketId = tickets.Tickets.First().Id;
-		var originalSummary = tickets.Tickets.First().Summary;
-		
+
+		var ticketId = tickets.Tickets[0].Id;
+		var originalSummary = tickets.Tickets[0].Summary;
+
 		var updateRequest = new UpdateTicketRequest
 		{
 			Summary = $"Updated via API Test - {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}",
@@ -249,12 +249,12 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		try
 		{
 			var result = await HaloClient.Psa.Tickets.UpdateAsync(ticketId, updateRequest, CancellationToken);
-			
+
 			// If update succeeds, verify the response
 			result.Should().NotBeNull();
 			result.Ticket.Should().NotBeNull();
 			result.Ticket.Id.Should().Be(ticketId);
-			
+
 			// Try to restore original state if possible
 			try
 			{
@@ -280,25 +280,25 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		// Arrange - First try to create a test ticket, or use existing one
 		var tickets = await HaloClient.Psa.Tickets.GetAllAsync(CancellationToken);
 		tickets.Tickets.Should().NotBeEmpty("Need at least one ticket to test delete behavior");
-		
+
 		int ticketIdToTest;
 		bool createdForTest = false;
-		
+
 		// Try to create a test ticket first
 		try
 		{
 			var clients = await HaloClient.Psa.Clients.GetAllAsync(CancellationToken);
 			var users = await HaloClient.Psa.Users.GetAllAsync(CancellationToken);
-			
+
 			if (clients.Any() && users.Any())
 			{
 				var createRequest = new CreateTicketRequest
 				{
 					Summary = $"Test Ticket for Deletion - {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss}",
-					ClientId = clients.First().Id,
-					UserId = users.First().Id
+					ClientId = clients[0].Id,
+					UserId = users[0].Id
 				};
-				
+
 				var created = await HaloClient.Psa.Tickets.CreateAsync(createRequest, CancellationToken);
 				ticketIdToTest = created.Ticket.Id;
 				createdForTest = true;
@@ -306,20 +306,20 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 			else
 			{
 				// Fall back to existing ticket (safer for sandbox)
-				ticketIdToTest = tickets.Tickets.First().Id;
+				ticketIdToTest = tickets.Tickets[0].Id;
 			}
 		}
 		catch (HaloApiException)
 		{
 			// Creation failed - use existing ticket
-			ticketIdToTest = tickets.Tickets.First().Id;
+			ticketIdToTest = tickets.Tickets[0].Id;
 		}
 
 		// Act & Assert - Test delete behavior
 		try
 		{
 			await HaloClient.Psa.Tickets.DeleteAsync(ticketIdToTest, CancellationToken);
-			
+
 			// If delete succeeds, verify the ticket is gone
 			var act = async () => await HaloClient.Psa.Tickets.GetByIdAsync(ticketIdToTest, CancellationToken);
 			await act.Should().ThrowAsync<HaloNotFoundException>("Deleted ticket should not be found");
@@ -344,16 +344,16 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		// Arrange - Get a real open ticket (dynamic discovery pattern!)
 		var tickets = await HaloClient.Psa.Tickets.GetAllAsync(CancellationToken);
 		tickets.Tickets.Should().NotBeEmpty("Need at least one ticket to test close");
-		
+
 		// Find an open ticket if possible
-		var openTicket = tickets.Tickets.FirstOrDefault(t => !t.IsClosed) ?? tickets.Tickets.First();
+		var openTicket = tickets.Tickets.FirstOrDefault(t => !t.IsClosed) ?? tickets.Tickets[0];
 		var ticketId = openTicket.Id;
 
 		// Act & Assert - Test close behavior
 		try
 		{
 			var result = await HaloClient.Psa.Tickets.CloseAsync(ticketId, "Closed by API test", CancellationToken);
-			
+
 			// If close succeeds, verify the response
 			result.Should().NotBeNull();
 			result.Ticket.Should().NotBeNull();
@@ -374,19 +374,19 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		// Arrange - Get real ticket and agent IDs (dynamic discovery pattern!)
 		var tickets = await HaloClient.Psa.Tickets.GetAllAsync(CancellationToken);
 		tickets.Tickets.Should().NotBeEmpty("Need at least one ticket to test assignment");
-		
+
 		var users = await HaloClient.Psa.Users.GetAllAsync(CancellationToken);
 		users.Should().NotBeEmpty("Need at least one user to test assignment");
-		
-		var ticketId = tickets.Tickets.First().Id;
-		var agent = users.Where(u => u.IsAgent).FirstOrDefault() ?? users.First();
+
+		var ticketId = tickets.Tickets[0].Id;
+		var agent = users.Where(u => u.IsAgent).FirstOrDefault() ?? users[0];
 		var agentId = agent.Id;
 
 		// Act & Assert - Test assignment behavior
 		try
 		{
 			var result = await HaloClient.Psa.Tickets.AssignAsync(ticketId, agentId, CancellationToken);
-			
+
 			// If assignment succeeds, verify the response
 			result.Should().NotBeNull();
 			result.Ticket.Should().NotBeNull();

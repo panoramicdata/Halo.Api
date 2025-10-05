@@ -6,7 +6,7 @@ namespace Halo.Api.Infrastructure;
 /// <summary>
 /// Wrapper for Projects API that provides both raw responses and convenient array access
 /// </summary>
-internal sealed class ProjectsApiWrapper(IProjectsRefitApi projectsRefitApi) : IProjectsApi
+public class ProjectsApiWrapper(IProjectsRefitApi projectsRefitApi) : IProjectsApi
 {
 	/// <summary>
 	/// Get all projects - Returns unwrapped array for convenience
@@ -23,5 +23,13 @@ internal sealed class ProjectsApiWrapper(IProjectsRefitApi projectsRefitApi) : I
 	public async Task<ProjectsResponse> GetResponseAsync(CancellationToken cancellationToken)
 	{
 		return await projectsRefitApi.GetResponseAsync(cancellationToken);
+	}
+
+	/// <summary>
+	/// Get a project by ID
+	/// </summary>
+	public async Task<Project> GetByIdAsync(int id, CancellationToken cancellationToken)
+	{
+		return await projectsRefitApi.GetByIdAsync(id, cancellationToken);
 	}
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFrameworks>net9.0;net10.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -15,14 +15,14 @@
 		<PackageProjectUrl>https://github.com/panoramicdata/HaloPSA.Api</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/panoramicdata/HaloPSA.Api</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<Description>Halo PSA API</Description>
+		<Description>A comprehensive, well-maintained .NET library for the Halo PSA API that follows .NET best practices and provides full CRUD coverage with modern C# patterns.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageTags>Halo PSA API</PackageTags>
+		<PackageTags>Halo;PSA;API;ServiceDesk;Tickets;ITSM;Professional Services;REST;HTTP;Client</PackageTags>
 		<PackageReleaseNotes>Changelog can be found at https://github.com/panoramicdata/HaloPSA.Api/blob/main/CHANGELOG.md</PackageReleaseNotes>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<Company>Panoramic Data Limited</Company>
-		<Product>Panoramic Data Limited</Product>
+		<Product>Halo PSA API</Product>
 		<NeutralLanguage>en</NeutralLanguage>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
