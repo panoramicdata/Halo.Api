@@ -12,12 +12,12 @@ public class HaloApiExceptionTests
 		var exception = new HaloApiException("Test error message");
 
 		// Assert
-		exception.Message.Should().Be("Test error message");
-		exception.StatusCode.Should().BeNull();
-		exception.ErrorCode.Should().BeNull();
-		exception.Details.Should().BeNull();
-		exception.RequestUrl.Should().BeNull();
-		exception.RequestMethod.Should().BeNull();
+		_ = exception.Message.Should().Be("Test error message");
+		_ = exception.StatusCode.Should().BeNull();
+		_ = exception.ErrorCode.Should().BeNull();
+		_ = exception.Details.Should().BeNull();
+		_ = exception.RequestUrl.Should().BeNull();
+		_ = exception.RequestMethod.Should().BeNull();
 	}
 
 	[Fact]
@@ -30,8 +30,8 @@ public class HaloApiExceptionTests
 		var exception = new HaloApiException("Outer error", innerException);
 
 		// Assert
-		exception.Message.Should().Be("Outer error");
-		exception.InnerException.Should().Be(innerException);
+		_ = exception.Message.Should().Be("Outer error");
+		_ = exception.InnerException.Should().Be(innerException);
 	}
 
 	[Fact]
@@ -56,13 +56,13 @@ public class HaloApiExceptionTests
 			innerException: innerException);
 
 		// Assert
-		exception.Message.Should().Be("Full error details");
-		exception.StatusCode.Should().Be(400);
-		exception.ErrorCode.Should().Be("VALIDATION_ERROR");
-		exception.Details.Should().BeEquivalentTo(details);
-		exception.RequestUrl.Should().Be("https://api.halopsa.com/tickets/123");
-		exception.RequestMethod.Should().Be("PUT");
-		exception.InnerException.Should().Be(innerException);
+		_ = exception.Message.Should().Be("Full error details");
+		_ = exception.StatusCode.Should().Be(400);
+		_ = exception.ErrorCode.Should().Be("VALIDATION_ERROR");
+		_ = exception.Details.Should().BeEquivalentTo(details);
+		_ = exception.RequestUrl.Should().Be("https://api.halopsa.com/tickets/123");
+		_ = exception.RequestMethod.Should().Be("PUT");
+		_ = exception.InnerException.Should().Be(innerException);
 	}
 
 	[Fact]
@@ -72,9 +72,9 @@ public class HaloApiExceptionTests
 		var exception = new HaloAuthenticationException("Authentication failed");
 
 		// Assert
-		exception.Should().BeOfType<HaloAuthenticationException>();
-		exception.Should().BeAssignableTo<HaloApiException>();
-		exception.Message.Should().Be("Authentication failed");
+		_ = exception.Should().BeOfType<HaloAuthenticationException>();
+		_ = exception.Should().BeAssignableTo<HaloApiException>();
+		_ = exception.Message.Should().Be("Authentication failed");
 	}
 
 	[Fact]
@@ -85,15 +85,17 @@ public class HaloApiExceptionTests
 			message: "Invalid credentials",
 			statusCode: 401,
 			errorCode: "INVALID_CREDENTIALS",
+			details: null,
 			requestUrl: "https://api.halopsa.com/auth/token",
-			requestMethod: "POST");
+			requestMethod: "POST",
+			innerException: null);
 
 		// Assert
-		exception.Message.Should().Be("Invalid credentials");
-		exception.StatusCode.Should().Be(401);
-		exception.ErrorCode.Should().Be("INVALID_CREDENTIALS");
-		exception.RequestUrl.Should().Be("https://api.halopsa.com/auth/token");
-		exception.RequestMethod.Should().Be("POST");
+		_ = exception.Message.Should().Be("Invalid credentials");
+		_ = exception.StatusCode.Should().Be(401);
+		_ = exception.ErrorCode.Should().Be("INVALID_CREDENTIALS");
+		_ = exception.RequestUrl.Should().Be("https://api.halopsa.com/auth/token");
+		_ = exception.RequestMethod.Should().Be("POST");
 	}
 
 	[Fact]
@@ -103,9 +105,9 @@ public class HaloApiExceptionTests
 		var exception = new HaloAuthorizationException("Access denied");
 
 		// Assert
-		exception.Should().BeOfType<HaloAuthorizationException>();
-		exception.Should().BeAssignableTo<HaloApiException>();
-		exception.Message.Should().Be("Access denied");
+		_ = exception.Should().BeOfType<HaloAuthorizationException>();
+		_ = exception.Should().BeAssignableTo<HaloApiException>();
+		_ = exception.Message.Should().Be("Access denied");
 	}
 
 	[Fact]
@@ -116,15 +118,20 @@ public class HaloApiExceptionTests
 			message: "Ticket not found",
 			resourceType: "Ticket",
 			resourceId: 123,
-			statusCode: 404);
+			statusCode: 404,
+			errorCode: null,
+			details: null,
+			requestUrl: null,
+			requestMethod: null,
+			innerException: null);
 
 		// Assert
-		exception.Message.Should().Be("Ticket not found");
-		exception.ResourceType.Should().Be("Ticket");
-		exception.ResourceId.Should().Be(123);
-		exception.StatusCode.Should().Be(404);
-		exception.Should().BeOfType<HaloNotFoundException>();
-		exception.Should().BeAssignableTo<HaloApiException>();
+		_ = exception.Message.Should().Be("Ticket not found");
+		_ = exception.ResourceType.Should().Be("Ticket");
+		_ = exception.ResourceId.Should().Be(123);
+		_ = exception.StatusCode.Should().Be(404);
+		_ = exception.Should().BeOfType<HaloNotFoundException>();
+		_ = exception.Should().BeAssignableTo<HaloApiException>();
 	}
 
 	[Fact]
@@ -141,14 +148,19 @@ public class HaloApiExceptionTests
 		var exception = new HaloBadRequestException(
 			message: "Validation failed",
 			validationErrors: validationErrors,
-			statusCode: 400);
+			statusCode: 400,
+			errorCode: null,
+			details: null,
+			requestUrl: null,
+			requestMethod: null,
+			innerException: null);
 
 		// Assert
-		exception.Message.Should().Be("Validation failed");
-		exception.ValidationErrors.Should().BeEquivalentTo(validationErrors);
-		exception.StatusCode.Should().Be(400);
-		exception.Should().BeOfType<HaloBadRequestException>();
-		exception.Should().BeAssignableTo<HaloApiException>();
+		_ = exception.Message.Should().Be("Validation failed");
+		_ = exception.ValidationErrors.Should().BeEquivalentTo(validationErrors);
+		_ = exception.StatusCode.Should().Be(400);
+		_ = exception.Should().BeOfType<HaloBadRequestException>();
+		_ = exception.Should().BeAssignableTo<HaloApiException>();
 	}
 
 	[Fact]
@@ -164,17 +176,22 @@ public class HaloApiExceptionTests
 			rateLimit: 100,
 			remainingRequests: 0,
 			resetTime: resetTime,
-			statusCode: 429);
+			statusCode: 429,
+			errorCode: null,
+			details: null,
+			requestUrl: null,
+			requestMethod: null,
+			innerException: null);
 
 		// Assert
-		exception.Message.Should().Be("Rate limit exceeded");
-		exception.RetryAfterSeconds.Should().Be(900);
-		exception.RateLimit.Should().Be(100);
-		exception.RemainingRequests.Should().Be(0);
-		exception.ResetTime.Should().Be(resetTime);
-		exception.StatusCode.Should().Be(429);
-		exception.Should().BeOfType<HaloRateLimitException>();
-		exception.Should().BeAssignableTo<HaloApiException>();
+		_ = exception.Message.Should().Be("Rate limit exceeded");
+		_ = exception.RetryAfterSeconds.Should().Be(900);
+		_ = exception.RateLimit.Should().Be(100);
+		_ = exception.RemainingRequests.Should().Be(0);
+		_ = exception.ResetTime.Should().Be(resetTime);
+		_ = exception.StatusCode.Should().Be(429);
+		_ = exception.Should().BeOfType<HaloRateLimitException>();
+		_ = exception.Should().BeAssignableTo<HaloApiException>();
 	}
 
 	[Fact]
@@ -184,14 +201,18 @@ public class HaloApiExceptionTests
 		var exception = new HaloServerException(
 			message: "Internal server error",
 			statusCode: 500,
-			errorCode: "INTERNAL_ERROR");
+			errorCode: "INTERNAL_ERROR",
+			details: null,
+			requestUrl: null,
+			requestMethod: null,
+			innerException: null);
 
 		// Assert
-		exception.Message.Should().Be("Internal server error");
-		exception.StatusCode.Should().Be(500);
-		exception.ErrorCode.Should().Be("INTERNAL_ERROR");
-		exception.Should().BeOfType<HaloServerException>();
-		exception.Should().BeAssignableTo<HaloApiException>();
+		_ = exception.Message.Should().Be("Internal server error");
+		_ = exception.StatusCode.Should().Be(500);
+		_ = exception.ErrorCode.Should().Be("INTERNAL_ERROR");
+		_ = exception.Should().BeOfType<HaloServerException>();
+		_ = exception.Should().BeAssignableTo<HaloApiException>();
 	}
 
 	[Fact]
@@ -212,9 +233,9 @@ public class HaloApiExceptionTests
 		foreach (var exception in exceptions)
 		{
 			// Act & Assert - should not throw
-			exception.Should().NotBeNull();
-			exception.Message.Should().NotBeNullOrEmpty();
-			exception.ToString().Should().NotBeNullOrEmpty();
+			_ = exception.Should().NotBeNull();
+			_ = exception.Message.Should().NotBeNullOrEmpty();
+			_ = exception.ToString().Should().NotBeNullOrEmpty();
 		}
 	}
 
@@ -230,19 +251,19 @@ public class HaloApiExceptionTests
 		var serverException = new HaloServerException("test");
 
 		// All should inherit from HaloApiException
-		authenticationException.Should().BeAssignableTo<HaloApiException>();
-		authorizationException.Should().BeAssignableTo<HaloApiException>();
-		notFoundException.Should().BeAssignableTo<HaloApiException>();
-		badRequestException.Should().BeAssignableTo<HaloApiException>();
-		rateLimitException.Should().BeAssignableTo<HaloApiException>();
-		serverException.Should().BeAssignableTo<HaloApiException>();
+		_ = authenticationException.Should().BeAssignableTo<HaloApiException>();
+		_ = authorizationException.Should().BeAssignableTo<HaloApiException>();
+		_ = notFoundException.Should().BeAssignableTo<HaloApiException>();
+		_ = badRequestException.Should().BeAssignableTo<HaloApiException>();
+		_ = rateLimitException.Should().BeAssignableTo<HaloApiException>();
+		_ = serverException.Should().BeAssignableTo<HaloApiException>();
 
 		// All should inherit from Exception
-		authenticationException.Should().BeAssignableTo<Exception>();
-		authorizationException.Should().BeAssignableTo<Exception>();
-		notFoundException.Should().BeAssignableTo<Exception>();
-		badRequestException.Should().BeAssignableTo<Exception>();
-		rateLimitException.Should().BeAssignableTo<Exception>();
-		serverException.Should().BeAssignableTo<Exception>();
+		_ = authenticationException.Should().BeAssignableTo<Exception>();
+		_ = authorizationException.Should().BeAssignableTo<Exception>();
+		_ = notFoundException.Should().BeAssignableTo<Exception>();
+		_ = badRequestException.Should().BeAssignableTo<Exception>();
+		_ = rateLimitException.Should().BeAssignableTo<Exception>();
+		_ = serverException.Should().BeAssignableTo<Exception>();
 	}
 }

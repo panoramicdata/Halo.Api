@@ -85,54 +85,71 @@ internal sealed class PsaApi(HttpClient _httpClient) : IPsaApi
 				message: $"Bad request: {message}",
 				validationErrors: validationErrors,
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
-				requestMethod: requestMethod),
+				requestMethod: requestMethod,
+				innerException: null),
 
 			401 => new HaloAuthenticationException(
 				message: $"Authentication failed: {message}",
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
-				requestMethod: requestMethod),
+				requestMethod: requestMethod,
+				innerException: null),
 
 			403 => new HaloAuthorizationException(
 				message: $"Authorization failed: {message}",
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
-				requestMethod: requestMethod),
+				requestMethod: requestMethod,
+				innerException: null),
 
 			404 => new HaloNotFoundException(
 				message: $"Resource not found: {message}",
 				resourceType: ExtractResourceTypeFromUrl(requestUrl),
 				resourceId: ExtractResourceIdFromUrl(requestUrl),
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
-				requestMethod: requestMethod),
+				requestMethod: requestMethod,
+				innerException: null),
 
 			429 => new HaloRateLimitException(
 				message: $"Rate limit exceeded: {message}",
 				retryAfterSeconds: ExtractRetryAfterSeconds(httpResponseMessage),
+				rateLimit: null,
+				remainingRequests: null,
+				resetTime: null,
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
-				requestMethod: requestMethod),
+				requestMethod: requestMethod,
+				innerException: null),
 
 			>= 500 => new HaloServerException(
 				message: $"Server error: {message}",
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
-				requestMethod: requestMethod),
+				requestMethod: requestMethod,
+				innerException: null),
 
 			_ => new HaloApiException(
 				message: $"API error: {message}",
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
-				requestMethod: requestMethod)
+				requestMethod: requestMethod,
+				innerException: null)
 		};
 	}
 
@@ -168,13 +185,16 @@ internal sealed class PsaApi(HttpClient _httpClient) : IPsaApi
 	/// <returns>The resource type or null if not found</returns>
 	private static string? ExtractResourceTypeFromUrl(string? url)
 	{
-		if (string.IsNullOrEmpty(url)) return null;
+		if (string.IsNullOrEmpty(url))
+		{
+			return null;
+		}
 
 		var uri = new Uri(url);
 		var segments = uri.Segments;
 
 		// Look for /api/{resourceType} pattern
-		for (int i = 0; i < segments.Length - 1; i++)
+		for (var i = 0; i < segments.Length - 1; i++)
 		{
 			if (segments[i].Equals("api/", StringComparison.OrdinalIgnoreCase))
 			{
@@ -193,23 +213,21 @@ internal sealed class PsaApi(HttpClient _httpClient) : IPsaApi
 	/// <returns>The resource ID or null if not found</returns>
 	private static object? ExtractResourceIdFromUrl(string? url)
 	{
-		if (string.IsNullOrEmpty(url)) return null;
+		if (string.IsNullOrEmpty(url))
+		{
+			return null;
+		}
 
 		var uri = new Uri(url);
 		var segments = uri.Segments;
 
 		// Look for /api/{resourceType}/{id} pattern
-		for (int i = 0; i < segments.Length - 2; i++)
+		for (var i = 0; i < segments.Length - 2; i++)
 		{
 			if (segments[i].Equals("api/", StringComparison.OrdinalIgnoreCase))
 			{
 				var idSegment = segments[i + 2].TrimEnd('/');
-				if (int.TryParse(idSegment, out var intId))
-				{
-					return intId;
-				}
-
-				return idSegment;
+				return int.TryParse(idSegment, out var intId) ? intId : idSegment;
 			}
 		}
 

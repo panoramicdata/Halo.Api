@@ -48,6 +48,16 @@ public class HaloApiException : Exception
 	}
 
 	/// <summary>
+	/// Initializes a new instance of the HaloApiException class with message and status code
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="statusCode">The HTTP status code associated with the error</param>
+	public HaloApiException(string message, int statusCode) : base(message)
+	{
+		StatusCode = statusCode;
+	}
+
+	/// <summary>
 	/// Initializes a new instance of the HaloApiException class with detailed error information
 	/// </summary>
 	/// <param name="message">The message that describes the error</param>
@@ -59,12 +69,12 @@ public class HaloApiException : Exception
 	/// <param name="innerException">The exception that is the cause of the current exception</param>
 	public HaloApiException(
 		string message,
-		int? statusCode = null,
-		string? errorCode = null,
-		Dictionary<string, object?>? details = null,
-		string? requestUrl = null,
-		string? requestMethod = null,
-		Exception? innerException = null)
+		int? statusCode,
+		string? errorCode,
+		Dictionary<string, object?>? details,
+		string? requestUrl,
+		string? requestMethod,
+		Exception? innerException)
 		: base(message, innerException)
 	{
 		StatusCode = statusCode;
@@ -98,6 +108,15 @@ public class HaloAuthenticationException : HaloApiException
 	}
 
 	/// <summary>
+	/// Initializes a new instance of the HaloAuthenticationException class with message and status code
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="statusCode">The HTTP status code associated with the error</param>
+	public HaloAuthenticationException(string message, int statusCode) : base(message, statusCode)
+	{
+	}
+
+	/// <summary>
 	/// Initializes a new instance of the HaloAuthenticationException class with detailed error information
 	/// </summary>
 	/// <param name="message">The message that describes the error</param>
@@ -109,12 +128,12 @@ public class HaloAuthenticationException : HaloApiException
 	/// <param name="innerException">The exception that is the cause of the current exception</param>
 	public HaloAuthenticationException(
 		string message,
-		int? statusCode = null,
-		string? errorCode = null,
-		Dictionary<string, object?>? details = null,
-		string? requestUrl = null,
-		string? requestMethod = null,
-		Exception? innerException = null)
+		int? statusCode,
+		string? errorCode,
+		Dictionary<string, object?>? details,
+		string? requestUrl,
+		string? requestMethod,
+		Exception? innerException)
 		: base(message, statusCode, errorCode, details, requestUrl, requestMethod, innerException)
 	{
 	}
@@ -143,6 +162,15 @@ public class HaloAuthorizationException : HaloApiException
 	}
 
 	/// <summary>
+	/// Initializes a new instance of the HaloAuthorizationException class with message and status code
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="statusCode">The HTTP status code associated with the error</param>
+	public HaloAuthorizationException(string message, int statusCode) : base(message, statusCode)
+	{
+	}
+
+	/// <summary>
 	/// Initializes a new instance of the HaloAuthorizationException class with detailed error information
 	/// </summary>
 	/// <param name="message">The message that describes the error</param>
@@ -154,12 +182,12 @@ public class HaloAuthorizationException : HaloApiException
 	/// <param name="innerException">The exception that is the cause of the current exception</param>
 	public HaloAuthorizationException(
 		string message,
-		int? statusCode = null,
-		string? errorCode = null,
-		Dictionary<string, object?>? details = null,
-		string? requestUrl = null,
-		string? requestMethod = null,
-		Exception? innerException = null)
+		int? statusCode,
+		string? errorCode,
+		Dictionary<string, object?>? details,
+		string? requestUrl,
+		string? requestMethod,
+		Exception? innerException)
 		: base(message, statusCode, errorCode, details, requestUrl, requestMethod, innerException)
 	{
 	}
@@ -198,6 +226,27 @@ public class HaloNotFoundException : HaloApiException
 	}
 
 	/// <summary>
+	/// Initializes a new instance of the HaloNotFoundException class with message and status code
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="statusCode">The HTTP status code associated with the error</param>
+	public HaloNotFoundException(string message, int statusCode) : base(message, statusCode)
+	{
+	}
+
+	/// <summary>
+	/// Initializes a new instance of the HaloNotFoundException class with resource information
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="resourceType">The type of resource that was not found</param>
+	/// <param name="resourceId">The ID of the resource that was not found</param>
+	public HaloNotFoundException(string message, string? resourceType, object? resourceId) : base(message)
+	{
+		ResourceType = resourceType;
+		ResourceId = resourceId;
+	}
+
+	/// <summary>
 	/// Initializes a new instance of the HaloNotFoundException class with detailed error information
 	/// </summary>
 	/// <param name="message">The message that describes the error</param>
@@ -211,14 +260,14 @@ public class HaloNotFoundException : HaloApiException
 	/// <param name="innerException">The exception that is the cause of the current exception</param>
 	public HaloNotFoundException(
 		string message,
-		string? resourceType = null,
-		object? resourceId = null,
-		int? statusCode = null,
-		string? errorCode = null,
-		Dictionary<string, object?>? details = null,
-		string? requestUrl = null,
-		string? requestMethod = null,
-		Exception? innerException = null)
+		string? resourceType,
+		object? resourceId,
+		int? statusCode,
+		string? errorCode,
+		Dictionary<string, object?>? details,
+		string? requestUrl,
+		string? requestMethod,
+		Exception? innerException)
 		: base(message, statusCode, errorCode, details, requestUrl, requestMethod, innerException)
 	{
 		ResourceType = resourceType;
@@ -254,6 +303,25 @@ public class HaloBadRequestException : HaloApiException
 	}
 
 	/// <summary>
+	/// Initializes a new instance of the HaloBadRequestException class with message and status code
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="statusCode">The HTTP status code associated with the error</param>
+	public HaloBadRequestException(string message, int statusCode) : base(message, statusCode)
+	{
+	}
+
+	/// <summary>
+	/// Initializes a new instance of the HaloBadRequestException class with validation errors
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="validationErrors">Validation errors from the API</param>
+	public HaloBadRequestException(string message, IReadOnlyList<string>? validationErrors) : base(message)
+	{
+		ValidationErrors = validationErrors;
+	}
+
+	/// <summary>
 	/// Initializes a new instance of the HaloBadRequestException class with detailed error information
 	/// </summary>
 	/// <param name="message">The message that describes the error</param>
@@ -266,13 +334,13 @@ public class HaloBadRequestException : HaloApiException
 	/// <param name="innerException">The exception that is the cause of the current exception</param>
 	public HaloBadRequestException(
 		string message,
-		IReadOnlyList<string>? validationErrors = null,
-		int? statusCode = null,
-		string? errorCode = null,
-		Dictionary<string, object?>? details = null,
-		string? requestUrl = null,
-		string? requestMethod = null,
-		Exception? innerException = null)
+		IReadOnlyList<string>? validationErrors,
+		int? statusCode,
+		string? errorCode,
+		Dictionary<string, object?>? details,
+		string? requestUrl,
+		string? requestMethod,
+		Exception? innerException)
 		: base(message, statusCode, errorCode, details, requestUrl, requestMethod, innerException)
 	{
 		ValidationErrors = validationErrors;
@@ -322,6 +390,25 @@ public class HaloRateLimitException : HaloApiException
 	}
 
 	/// <summary>
+	/// Initializes a new instance of the HaloRateLimitException class with message and status code
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="statusCode">The HTTP status code associated with the error</param>
+	public HaloRateLimitException(string message, int statusCode) : base(message, statusCode)
+	{
+	}
+
+	/// <summary>
+	/// Initializes a new instance of the HaloRateLimitException class with rate limit information
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="retryAfterSeconds">Number of seconds to wait before retrying</param>
+	public HaloRateLimitException(string message, int? retryAfterSeconds) : base(message)
+	{
+		RetryAfterSeconds = retryAfterSeconds;
+	}
+
+	/// <summary>
 	/// Initializes a new instance of the HaloRateLimitException class with detailed error information
 	/// </summary>
 	/// <param name="message">The message that describes the error</param>
@@ -337,16 +424,16 @@ public class HaloRateLimitException : HaloApiException
 	/// <param name="innerException">The exception that is the cause of the current exception</param>
 	public HaloRateLimitException(
 		string message,
-		int? retryAfterSeconds = null,
-		int? rateLimit = null,
-		int? remainingRequests = null,
-		DateTime? resetTime = null,
-		int? statusCode = null,
-		string? errorCode = null,
-		Dictionary<string, object?>? details = null,
-		string? requestUrl = null,
-		string? requestMethod = null,
-		Exception? innerException = null)
+		int? retryAfterSeconds,
+		int? rateLimit,
+		int? remainingRequests,
+		DateTime? resetTime,
+		int? statusCode,
+		string? errorCode,
+		Dictionary<string, object?>? details,
+		string? requestUrl,
+		string? requestMethod,
+		Exception? innerException)
 		: base(message, statusCode, errorCode, details, requestUrl, requestMethod, innerException)
 	{
 		RetryAfterSeconds = retryAfterSeconds;
@@ -379,6 +466,15 @@ public class HaloServerException : HaloApiException
 	}
 
 	/// <summary>
+	/// Initializes a new instance of the HaloServerException class with message and status code
+	/// </summary>
+	/// <param name="message">The message that describes the error</param>
+	/// <param name="statusCode">The HTTP status code associated with the error</param>
+	public HaloServerException(string message, int statusCode) : base(message, statusCode)
+	{
+	}
+
+	/// <summary>
 	/// Initializes a new instance of the HaloServerException class with detailed error information
 	/// </summary>
 	/// <param name="message">The message that describes the error</param>
@@ -390,12 +486,12 @@ public class HaloServerException : HaloApiException
 	/// <param name="innerException">The exception that is the cause of the current exception</param>
 	public HaloServerException(
 		string message,
-		int? statusCode = null,
-		string? errorCode = null,
-		Dictionary<string, object?>? details = null,
-		string? requestUrl = null,
-		string? requestMethod = null,
-		Exception? innerException = null)
+		int? statusCode,
+		string? errorCode,
+		Dictionary<string, object?>? details,
+		string? requestUrl,
+		string? requestMethod,
+		Exception? innerException)
 		: base(message, statusCode, errorCode, details, requestUrl, requestMethod, innerException)
 	{
 	}

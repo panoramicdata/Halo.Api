@@ -66,7 +66,8 @@ function Write-ColorOutput {
         [string]$Message,
         [string]$Color = $Reset
     )
-    Write-Host "$Color$Message$Reset"
+    # Use Write-Output instead of Write-Host for better PowerShell practices
+    Write-Output "$Color$Message$Reset"
 }
 
 function Write-Step {
@@ -158,7 +159,7 @@ function Invoke-Tests {
     $testExitCode = $LASTEXITCODE
     
     # Display the test output
-    $testResult | ForEach-Object { Write-Host $_ }
+    $testResult | ForEach-Object { Write-Output $_ }
     
     if ($testExitCode -ne 0) {
         Write-Error "Tests failed with exit code $testExitCode"

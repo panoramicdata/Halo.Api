@@ -28,9 +28,9 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 		}
 		catch (ApiException apiException)
 		{
-			_logger.LogError(apiException, "API exception occurred: {StatusCode} {ReasonPhrase}", 
+			_logger.LogError(apiException, "API exception occurred: {StatusCode} {ReasonPhrase}",
 				apiException.StatusCode, apiException.ReasonPhrase);
-			
+
 			// Convert Refit ApiException to appropriate HaloApiException
 			var haloException = ConvertToHaloApiException(apiException, request);
 			throw haloException;
@@ -65,7 +65,7 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 			{
 				var jsonDoc = JsonDocument.Parse(apiException.Content);
 				details = ExtractErrorDetails(jsonDoc.RootElement);
-				
+
 				// Extract validation errors if present
 				if (jsonDoc.RootElement.TryGetProperty("errors", out var errorsElement))
 				{
@@ -80,6 +80,7 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 							}
 						}
 					}
+
 					validationErrors = errorsList.AsReadOnly();
 				}
 			}
@@ -97,6 +98,7 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 				message: $"Bad request: {message}",
 				validationErrors: validationErrors,
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
 				requestMethod: requestMethod,
@@ -105,6 +107,7 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 			401 => new HaloAuthenticationException(
 				message: $"Authentication failed: {message}",
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
 				requestMethod: requestMethod,
@@ -113,6 +116,7 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 			403 => new HaloAuthorizationException(
 				message: $"Authorization failed: {message}",
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
 				requestMethod: requestMethod,
@@ -123,6 +127,7 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 				resourceType: ExtractResourceTypeFromUrl(requestUrl),
 				resourceId: ExtractResourceIdFromUrl(requestUrl),
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
 				requestMethod: requestMethod,
@@ -131,7 +136,11 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 			429 => new HaloRateLimitException(
 				message: $"Rate limit exceeded: {message}",
 				retryAfterSeconds: ExtractRetryAfterSeconds(apiException),
+				rateLimit: null,
+				remainingRequests: null,
+				resetTime: null,
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
 				requestMethod: requestMethod,
@@ -140,6 +149,7 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 			>= 500 => new HaloServerException(
 				message: $"Server error: {message}",
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
 				requestMethod: requestMethod,
@@ -148,6 +158,7 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 			_ => new HaloApiException(
 				message: $"API error: {message}",
 				statusCode: statusCode,
+				errorCode: null,
 				details: details,
 				requestUrl: requestUrl,
 				requestMethod: requestMethod,
@@ -187,13 +198,16 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 	/// <returns>The resource type or null if not found</returns>
 	private static string? ExtractResourceTypeFromUrl(string? url)
 	{
-		if (string.IsNullOrEmpty(url)) return null;
+		if (string.IsNullOrEmpty(url))
+		{
+			return null;
+		}
 
 		var uri = new Uri(url);
 		var segments = uri.Segments;
-		
+
 		// Look for /api/{resourceType} pattern
-		for (int i = 0; i < segments.Length - 1; i++)
+		for (var i = 0; i < segments.Length - 1; i++)
 		{
 			if (segments[i].Equals("api/", StringComparison.OrdinalIgnoreCase))
 			{
@@ -212,22 +226,21 @@ internal sealed class ErrorHandler(ILogger? logger) : DelegatingHandler
 	/// <returns>The resource ID or null if not found</returns>
 	private static object? ExtractResourceIdFromUrl(string? url)
 	{
-		if (string.IsNullOrEmpty(url)) return null;
+		if (string.IsNullOrEmpty(url))
+		{
+			return null;
+		}
 
 		var uri = new Uri(url);
 		var segments = uri.Segments;
-		
+
 		// Look for /api/{resourceType}/{id} pattern
-		for (int i = 0; i < segments.Length - 2; i++)
+		for (var i = 0; i < segments.Length - 2; i++)
 		{
 			if (segments[i].Equals("api/", StringComparison.OrdinalIgnoreCase))
 			{
 				var idSegment = segments[i + 2].TrimEnd('/');
-				if (int.TryParse(idSegment, out var intId))
-				{
-					return intId;
-				}
-				return idSegment;
+				return int.TryParse(idSegment, out var intId) ? intId : idSegment;
 			}
 		}
 
