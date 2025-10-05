@@ -89,7 +89,7 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 			.ToList();
 
 		// If no tickets have client assignments, just use the first client and verify the filter works
-		var clientId = clientsWithTickets.Any() ? clientsWithTickets.First() : clients[0].Id;
+		var clientId = clientsWithTickets.Count != 0 ? clientsWithTickets.First() : clients[0].Id;
 		var filter = new TicketFilter { ClientId = clientId, Count = 10 };
 
 		// Act
