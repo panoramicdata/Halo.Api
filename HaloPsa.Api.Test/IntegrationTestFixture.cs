@@ -31,29 +31,29 @@ public class IntegrationTestFixture : IDisposable
 
 	private void ValidateUserSecrets()
 	{
-		var haloAccount = Configuration["HaloApi:HaloAccount"];
-		var haloClientId = Configuration["HaloApi:HaloClientId"];
-		var haloClientSecret = Configuration["HaloApi:HaloClientSecret"];
+		var haloAccount = Configuration["HaloApi:Account"];
+		var haloClientId = Configuration["HaloApi:ClientId"];
+		var haloClientSecret = Configuration["HaloApi:ClientSecret"];
 
 		if (string.IsNullOrWhiteSpace(haloAccount))
 		{
 			throw new InvalidOperationException(
-				"HaloApi:HaloAccount not found in user secrets. " +
-				"Please run: dotnet user-secrets set \"HaloApi:HaloAccount\" \"your-account-name\" --project Halo.Api.Test");
+				"HaloApi:Account not found in user secrets. " +
+				"Please run: dotnet user-secrets set \"HaloApi:Account\" \"your-account-name\" --project Halo.Api.Test");
 		}
 
 		if (string.IsNullOrWhiteSpace(haloClientId))
 		{
 			throw new InvalidOperationException(
-				"HaloApi:HaloClientId not found in user secrets. " +
-				"Please run: dotnet user-secrets set \"HaloApi:HaloClientId\" \"your-client-id\" --project Halo.Api.Test");
+				"HaloApi:ClientId not found in user secrets. " +
+				"Please run: dotnet user-secrets set \"HaloApi:ClientId\" \"your-client-id\" --project Halo.Api.Test");
 		}
 
 		if (string.IsNullOrWhiteSpace(haloClientSecret))
 		{
 			throw new InvalidOperationException(
-				"HaloApi:HaloClientSecret not found in user secrets. " +
-				"Please run: dotnet user-secrets set \"HaloApi:HaloClientSecret\" \"your-client-secret\" --project Halo.Api.Test");
+				"HaloApi:ClientSecret not found in user secrets. " +
+				"Please run: dotnet user-secrets set \"HaloApi:ClientSecret\" \"your-client-secret\" --project Halo.Api.Test");
 		}
 
 		Logger.LogInformation("User secrets validation passed for account: {Account}", haloAccount);
@@ -65,16 +65,16 @@ public class IntegrationTestFixture : IDisposable
 		{
 			var options = new HaloClientOptions
 			{
-				HaloAccount = Configuration["HaloApi:HaloAccount"]!,
-				HaloClientId = Configuration["HaloApi:HaloClientId"]!,
-				HaloClientSecret = Configuration["HaloApi:HaloClientSecret"]!,
+				Account = Configuration["HaloApi:Account"]!,
+				ClientId = Configuration["HaloApi:ClientId"]!,
+				ClientSecret = Configuration["HaloApi:ClientSecret"]!,
 				Logger = Logger,
 				EnableRequestLogging = true,
 				EnableResponseLogging = true
 			};
 
 			_haloClient = new HaloClient(options);
-			Logger.LogInformation("Successfully created HaloClient for account: {Account}", options.HaloAccount);
+			Logger.LogInformation("Successfully created HaloClient for account: {Account}", options.Account);
 		}
 
 		return _haloClient;

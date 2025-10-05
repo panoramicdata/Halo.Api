@@ -149,8 +149,8 @@ internal sealed class AuthenticationHandler : DelegatingHandler
 			var formData = new FormUrlEncodedContent(new Dictionary<string, string>
 			{
 				["grant_type"] = "client_credentials",
-				["client_id"] = _options.HaloClientId,
-				["client_secret"] = _options.HaloClientSecret,
+				["client_id"] = _options.ClientId,
+				["client_secret"] = _options.ClientSecret,
 				["scope"] = "all"
 			});
 

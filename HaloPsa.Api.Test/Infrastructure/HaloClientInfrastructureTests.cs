@@ -13,9 +13,9 @@ public class HaloClientInfrastructureTests(IntegrationTestFixture fixture)
 		// Arrange
 		var options = new HaloClientOptions
 		{
-			HaloAccount = _fixture.Configuration["HaloApi:HaloAccount"] ?? throw new InvalidOperationException("HaloApi:HaloAccount not found"),
-			HaloClientId = _fixture.Configuration["HaloApi:HaloClientId"] ?? throw new InvalidOperationException("HaloApi:HaloClientId not found"),
-			HaloClientSecret = _fixture.Configuration["HaloApi:HaloClientSecret"] ?? throw new InvalidOperationException("HaloApi:HaloClientSecret not found")
+			Account = _fixture.Configuration["HaloApi:Account"] ?? throw new InvalidOperationException("HaloApi:Account not found"),
+			ClientId = _fixture.Configuration["HaloApi:ClientId"] ?? throw new InvalidOperationException("HaloApi:ClientId not found"),
+			ClientSecret = _fixture.Configuration["HaloApi:ClientSecret"] ?? throw new InvalidOperationException("HaloApi:ClientSecret not found")
 		};
 
 		// Act
@@ -23,7 +23,7 @@ public class HaloClientInfrastructureTests(IntegrationTestFixture fixture)
 
 		// Assert
 		_ = client.Should().NotBeNull();
-		_ = client.Account.Should().Be(options.HaloAccount);
+		_ = client.Account.Should().Be(options.Account);
 		_ = client.BaseUrl.Should().NotBeNullOrEmpty();
 		_ = client.Psa.Should().NotBeNull();
 		_ = client.ServiceDesk.Should().NotBeNull();
@@ -36,9 +36,9 @@ public class HaloClientInfrastructureTests(IntegrationTestFixture fixture)
 		// Arrange
 		var options = new HaloClientOptions
 		{
-			HaloAccount = _fixture.Configuration["HaloApi:HaloAccount"] ?? throw new InvalidOperationException("HaloApi:HaloAccount not found"),
-			HaloClientId = _fixture.Configuration["HaloApi:HaloClientId"] ?? throw new InvalidOperationException("HaloApi:HaloClientId not found"),
-			HaloClientSecret = _fixture.Configuration["HaloApi:HaloClientSecret"] ?? throw new InvalidOperationException("HaloApi:HaloClientSecret not found"),
+			Account = _fixture.Configuration["HaloApi:Account"] ?? throw new InvalidOperationException("HaloApi:Account not found"),
+			ClientId = _fixture.Configuration["HaloApi:ClientId"] ?? throw new InvalidOperationException("HaloApi:ClientId not found"),
+			ClientSecret = _fixture.Configuration["HaloApi:ClientSecret"] ?? throw new InvalidOperationException("HaloApi:ClientSecret not found"),
 			RequestTimeout = TimeSpan.FromSeconds(60),
 			MaxRetryAttempts = 5,
 			RetryDelay = TimeSpan.FromSeconds(2),
@@ -52,28 +52,8 @@ public class HaloClientInfrastructureTests(IntegrationTestFixture fixture)
 
 		// Assert
 		_ = client.Should().NotBeNull();
-		_ = client.Account.Should().Be(options.HaloAccount);
-		_ = client.BaseUrl.Should().Contain(options.HaloAccount);
-	}
-
-	[Fact]
-	public void HaloClient_WithCustomBaseUrl_UsesCustomUrl()
-	{
-		// Arrange
-		var customBaseUrl = "https://custom.halopsa.com";
-		var options = new HaloClientOptions
-		{
-			HaloAccount = _fixture.Configuration["HaloApi:HaloAccount"] ?? throw new InvalidOperationException("HaloApi:HaloAccount not found"),
-			HaloClientId = _fixture.Configuration["HaloApi:HaloClientId"] ?? throw new InvalidOperationException("HaloApi:HaloClientId not found"),
-			HaloClientSecret = _fixture.Configuration["HaloApi:HaloClientSecret"] ?? throw new InvalidOperationException("HaloApi:HaloClientSecret not found"),
-			BaseUrl = customBaseUrl
-		};
-
-		// Act
-		using var client = new HaloClient(options);
-
-		// Assert
-		_ = client.BaseUrl.Should().Be(customBaseUrl);
+		_ = client.Account.Should().Be(options.Account);
+		_ = client.BaseUrl.Should().Contain(options.Account);
 	}
 
 	[Fact]
@@ -82,13 +62,13 @@ public class HaloClientInfrastructureTests(IntegrationTestFixture fixture)
 		// Arrange & Act & Assert
 		Action act = () => new HaloClientOptions
 		{
-			HaloAccount = "",
-			HaloClientId = Guid.NewGuid().ToString(),
-			HaloClientSecret = $"{Guid.NewGuid()}-{Guid.NewGuid()}"
+			Account = "",
+			ClientId = Guid.NewGuid().ToString(),
+			ClientSecret = $"{Guid.NewGuid()}-{Guid.NewGuid()}"
 		}.Validate();
 
 		_ = act.Should().Throw<ArgumentException>()
-			.WithMessage("HaloAccount cannot be null or empty.*");
+			.WithMessage("Account cannot be null or empty.*");
 	}
 
 	[Fact]
@@ -97,13 +77,13 @@ public class HaloClientInfrastructureTests(IntegrationTestFixture fixture)
 		// Arrange & Act & Assert
 		Action act = () => new HaloClientOptions
 		{
-			HaloAccount = "test-account",
-			HaloClientId = "invalid-guid",
-			HaloClientSecret = $"{Guid.NewGuid()}-{Guid.NewGuid()}"
+			Account = "test-account",
+			ClientId = "invalid-guid",
+			ClientSecret = $"{Guid.NewGuid()}-{Guid.NewGuid()}"
 		}.Validate();
 
 		_ = act.Should().Throw<FormatException>()
-			.WithMessage("HaloClientId must be a valid GUID format*");
+			.WithMessage("ClientId must be a valid GUID format*");
 	}
 
 	[Fact]
@@ -112,13 +92,13 @@ public class HaloClientInfrastructureTests(IntegrationTestFixture fixture)
 		// Arrange & Act & Assert
 		Action act = () => new HaloClientOptions
 		{
-			HaloAccount = "test-account",
-			HaloClientId = Guid.NewGuid().ToString(),
-			HaloClientSecret = "invalid-secret"
+			Account = "test-account",
+			ClientId = Guid.NewGuid().ToString(),
+			ClientSecret = "invalid-secret"
 		}.Validate();
 
 		_ = act.Should().Throw<FormatException>()
-			.WithMessage("HaloClientSecret must be in the format of two concatenated GUIDs*");
+			.WithMessage("ClientSecret must be in the format of two concatenated GUIDs*");
 	}
 
 	[Fact]
@@ -127,9 +107,9 @@ public class HaloClientInfrastructureTests(IntegrationTestFixture fixture)
 		// Arrange & Act & Assert
 		Action act = () => new HaloClientOptions
 		{
-			HaloAccount = "test-account",
-			HaloClientId = Guid.NewGuid().ToString(),
-			HaloClientSecret = $"{Guid.NewGuid()}-{Guid.NewGuid()}",
+			Account = "test-account",
+			ClientId = Guid.NewGuid().ToString(),
+			ClientSecret = $"{Guid.NewGuid()}-{Guid.NewGuid()}",
 			RequestTimeout = TimeSpan.Zero
 		}.Validate();
 

@@ -63,17 +63,17 @@ public class DiagnosticTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		// Diagnostic test to verify user secrets are loaded correctly
 		var config = _fixture.Configuration;
 
-		var account = config["HaloApi:HaloAccount"];
-		var clientId = config["HaloApi:HaloClientId"];
-		var clientSecret = config["HaloApi:HaloClientSecret"];
+		var account = config["HaloApi:Account"];
+		var clientId = config["HaloApi:ClientId"];
+		var clientSecret = config["HaloApi:ClientSecret"];
 
-		Console.WriteLine($"HaloAccount: {account}");
-		Console.WriteLine($"HaloClientId: {clientId}");
-		Console.WriteLine($"HaloClientSecret: {(!string.IsNullOrEmpty(clientSecret) ? "***SET***" : "NOT SET")}");
+		Console.WriteLine($"Account: {account}");
+		Console.WriteLine($"ClientId: {clientId}");
+		Console.WriteLine($"ClientSecret: {(!string.IsNullOrEmpty(clientSecret) ? "***SET***" : "NOT SET")}");
 
-		Logger.LogInformation("HaloAccount: {Account}", account);
-		Logger.LogInformation("HaloClientId: {ClientId}", clientId);
-		Logger.LogInformation("HaloClientSecret: {HasSecret}", !string.IsNullOrEmpty(clientSecret) ? "***SET***" : "NOT SET");
+		Logger.LogInformation("Account: {Account}", account);
+		Logger.LogInformation("ClientId: {ClientId}", clientId);
+		Logger.LogInformation("ClientSecret: {HasSecret}", !string.IsNullOrEmpty(clientSecret) ? "***SET***" : "NOT SET");
 
 		_ = account.Should().NotBeNullOrEmpty();
 		_ = clientId.Should().NotBeNullOrEmpty();

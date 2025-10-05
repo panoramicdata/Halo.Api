@@ -20,8 +20,8 @@ public class ManualAuthTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		var formData = new FormUrlEncodedContent(new Dictionary<string, string>
 		{
 			["grant_type"] = "client_credentials",
-			["client_id"] = config["HaloApi:HaloClientId"]!,
-			["client_secret"] = config["HaloApi:HaloClientSecret"]!,
+			["client_id"] = config["HaloApi:ClientId"]!,
+			["client_secret"] = config["HaloApi:ClientSecret"]!,
 			["scope"] = "all"
 		});
 

@@ -1,5 +1,5 @@
-﻿using System.Text.RegularExpressions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
 
 namespace HaloPsa.Api;
 
@@ -14,22 +14,17 @@ public partial class HaloClientOptions
 	/// <summary>
 	/// Gets or sets the Halo account identifier
 	/// </summary>
-	public required string HaloAccount { get; init; }
+	public required string Account { get; init; }
 
 	/// <summary>
 	/// Gets or sets the Halo client ID (must be in GUID format)
 	/// </summary>
-	public required string HaloClientId { get; init; }
+	public required string ClientId { get; init; }
 
 	/// <summary>
 	/// Gets or sets the Halo client secret (must be in the format of two concatenated GUIDs)
 	/// </summary>
-	public required string HaloClientSecret { get; init; }
-
-	/// <summary>
-	/// Gets or sets the base URL for the Halo API. If null, uses the default cloud URL based on HaloAccount
-	/// </summary>
-	public string? BaseUrl { get; init; }
+	public required string ClientSecret { get; init; }
 
 	/// <summary>
 	/// Gets or sets the HTTP request timeout. Default is 30 seconds
@@ -79,33 +74,33 @@ public partial class HaloClientOptions
 	/// <summary>
 	/// Gets the effective base URL for the Halo API
 	/// </summary>
-	internal string EffectiveBaseUrl => BaseUrl ?? $"https://{HaloAccount}.halopsa.com";
+	internal string EffectiveBaseUrl => $"https://{Account}.halopsa.com";
 
 	internal void Validate()
 	{
-		if (string.IsNullOrWhiteSpace(HaloAccount))
+		if (string.IsNullOrWhiteSpace(Account))
 		{
-			throw new ArgumentException("HaloAccount cannot be null or empty.", nameof(HaloAccount));
+			throw new ArgumentException("Account cannot be null or empty.", nameof(Account));
 		}
 
-		if (string.IsNullOrWhiteSpace(HaloClientId))
+		if (string.IsNullOrWhiteSpace(ClientId))
 		{
-			throw new ArgumentException("HaloClientId cannot be null or empty.", nameof(HaloClientId));
+			throw new ArgumentException("ClientId cannot be null or empty.", nameof(ClientId));
 		}
 
-		if (string.IsNullOrWhiteSpace(HaloClientSecret))
+		if (string.IsNullOrWhiteSpace(ClientSecret))
 		{
-			throw new ArgumentException("HaloClientSecret cannot be null or empty.", nameof(HaloClientSecret));
+			throw new ArgumentException("ClientSecret cannot be null or empty.", nameof(ClientSecret));
 		}
 
-		if (!_guidRegex.IsMatch(HaloClientId))
+		if (!_guidRegex.IsMatch(ClientId))
 		{
-			throw new FormatException("HaloClientId must be a valid GUID format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).");
+			throw new FormatException("ClientId must be a valid GUID format (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).");
 		}
 
-		if (!_haloClientSecretRegex.IsMatch(HaloClientSecret))
+		if (!_haloClientSecretRegex.IsMatch(ClientSecret))
 		{
-			throw new FormatException("HaloClientSecret must be in the format of two concatenated GUIDs (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).");
+			throw new FormatException("ClientSecret must be in the format of two concatenated GUIDs (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx).");
 		}
 
 		if (RequestTimeout <= TimeSpan.Zero)
@@ -126,12 +121,6 @@ public partial class HaloClientOptions
 		if (MaxRetryDelay < RetryDelay)
 		{
 			throw new ArgumentException("MaxRetryDelay must be greater than or equal to RetryDelay.", nameof(MaxRetryDelay));
-		}
-
-		// Validate BaseUrl if provided
-		if (BaseUrl != null && !Uri.TryCreate(BaseUrl, UriKind.Absolute, out _))
-		{
-			throw new ArgumentException("BaseUrl must be a valid absolute URI.", nameof(BaseUrl));
 		}
 	}
 

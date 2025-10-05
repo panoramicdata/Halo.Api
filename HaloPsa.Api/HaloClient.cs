@@ -23,7 +23,7 @@ public class HaloClient : IHaloClient, IDisposable
 		options.Validate();
 
 		_options = options;
-		Account = options.HaloAccount;
+		Account = options.Account;
 		_httpClient = CreateHttpClient();
 
 		// Initialize API modules lazily
