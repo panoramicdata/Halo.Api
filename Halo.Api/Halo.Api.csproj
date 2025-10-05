@@ -10,6 +10,7 @@
 		<WarningsNotAsErrors>VSSpell001</WarningsNotAsErrors>
 		<AnalysisLevel>latest-recommended</AnalysisLevel>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>HaloPsa.Api</PackageId>
 		<Authors>Panoramic Data Limited</Authors>
 		<Copyright>Panoramic Data Limited 2025</Copyright>
 		<PackageProjectUrl>https://github.com/panoramicdata/HaloPSA.Api</PackageProjectUrl>
