@@ -1,5 +1,6 @@
 ﻿# Halo PSA API .NET Library
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/bdd973c7af5b4a6b8797fbe94ce01b76)](https://app.codacy.com/gh/panoramicdata/Halo.Api?utm_source=github.com&utm_medium=referral&utm_content=panoramicdata/Halo.Api&utm_campaign=Badge_Grade)
 [![NuGet Version](https://img.shields.io/nuget/v/Halo.Api)](https://www.nuget.org/packages/Halo.Api)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Halo.Api)](https://www.nuget.org/packages/Halo.Api)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/panoramicdata/HaloPSA.Api/build.yml)](https://github.com/panoramicdata/HaloPSA.Api/actions)
