@@ -237,7 +237,7 @@ git push origin v1.0.0
 ### **NuGet Package Configuration**
 
 **Package Details**:
-- **Package ID**: `Halo.Api`
+- **Package ID**: `HaloPsa.Api`
 - **Target Frameworks**: .NET 9.0, .NET 10.0
 - **Author**: Panoramic Data Limited
 - **License**: MIT
@@ -254,13 +254,13 @@ git push origin v1.0.0
 
 ```bash
 # Install latest stable version
-dotnet add package Halo.Api
+dotnet add package HaloPsa.Api
 
 # Install specific version
-dotnet add package Halo.Api --version 1.2.0
+dotnet add package HaloPsa.Api --version 1.2.0
 
 # Install pre-release version
-dotnet add package Halo.Api --version 2.0.0-beta --prerelease
+dotnet add package HaloPsa.Api --version 2.0.0-beta --prerelease
 ```
 
 ```csharp
