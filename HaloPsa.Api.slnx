@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/.github/">
+    <File Path=".github/workflows/publish-nuget.yml" />
     <File Path="copilot-instructions.md" />
   </Folder>
   <Folder Name="/Solution Items/">
