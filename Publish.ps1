@@ -372,17 +372,22 @@ function Main {
         # Get version
         $versionToPublish = Get-VersionInput
         
-        # Confirm publication
+        # Show publication summary (no confirmation needed for automated versioning)
         if (-not $DryRun) {
             Write-ColorOutput "`n?? Publication Summary:" $Magenta
             Write-ColorOutput "  Version: v$versionToPublish" $Cyan
             Write-ColorOutput "  Target: NuGet.org" $Cyan
             Write-ColorOutput "  Package: Halo.Api" $Cyan
             
-            $confirm = Read-Host "`nProceed with publication? (y/N)"
-            if ($confirm -ne "y" -and $confirm -ne "Y") {
-                Write-Warning "Publication cancelled by user"
-                return
+            # Only prompt for confirmation if version was manually specified
+            if ($Version) {
+                $confirm = Read-Host "`nProceed with publication? (y/N)"
+                if ($confirm -ne "y" -and $confirm -ne "Y") {
+                    Write-Warning "Publication cancelled by user"
+                    return
+                }
+            } else {
+                Write-ColorOutput "`n? Proceeding with automated publication (version determined by nbgv)" $Green
             }
         }
         
