@@ -229,49 +229,84 @@ function Get-VersionInput {
     }
     
     Write-ColorOutput "`n?? Version Information" $Magenta
-    Write-ColorOutput "Current tags:" $Cyan
     
-    # Show recent tags
-    $recentTags = git tag --sort=-version:refname | Select-Object -First 10
-    if ($recentTags) {
-        $recentTags | ForEach-Object { Write-ColorOutput "  $_" $Cyan }
-    } else {
-        Write-ColorOutput "  No existing tags" $Cyan
-    }
-    
-    Write-ColorOutput "`nVersion format examples:" $Yellow
-    Write-ColorOutput "  • 1.0.0 (release)" $Yellow
-    Write-ColorOutput "  • 1.2.3-beta (pre-release)" $Yellow
-    Write-ColorOutput "  • 2.0.0-alpha.1 (pre-release)" $Yellow
-    
-    do {
-        $inputVersion = Read-Host "`nEnter version to publish (without 'v' prefix)"
-        if ([string]::IsNullOrWhiteSpace($inputVersion)) {
-            Write-Warning "Version cannot be empty"
-            continue
+    # Use nbgv to get the automatically determined version
+    Write-Step "Getting version from nbgv (Nerdbank.GitVersioning)..."
+    try {
+        $nbgvOutput = nbgv get-version --format json 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            throw "nbgv command failed"
         }
         
-        # Basic version validation
-        if ($inputVersion -notmatch '^\d+\.\d+\.\d+(-[\w\d\.-]+)?$') {
-            Write-Warning "Invalid version format. Use semantic versioning (e.g., 1.0.0, 1.2.3-beta)"
-            continue
-        }
+        $versionInfo = $nbgvOutput | ConvertFrom-Json
+        $autoVersion = $versionInfo.NuGetPackageVersion
         
-        $tag = "v$inputVersion"
+        Write-ColorOutput "Automatically determined version: $autoVersion" $Green
+        Write-ColorOutput "  Version: $($versionInfo.Version)" $Cyan
+        Write-ColorOutput "  AssemblyVersion: $($versionInfo.AssemblyVersion)" $Cyan
+        Write-ColorOutput "  NuGetPackageVersion: $($versionInfo.NuGetPackageVersion)" $Cyan
+        
+        # Show recent tags for context
+        Write-ColorOutput "`nRecent tags:" $Cyan
+        $recentTags = git tag --sort=-version:refname | Select-Object -First 5
+        if ($recentTags) {
+            $recentTags | ForEach-Object { Write-ColorOutput "  $_" $Cyan }
+        } else {
+            Write-ColorOutput "  No existing tags" $Cyan
+        }
         
         # Check if tag already exists
+        $tag = "v$autoVersion"
         $existingTag = git tag -l $tag
         if ($existingTag) {
             Write-Warning "Tag '$tag' already exists"
             $overwrite = Read-Host "Overwrite existing tag? (y/N)"
-            if ($overwrite -eq "y" -or $overwrite -eq "Y") {
-                return $inputVersion
+            if ($overwrite -ne "y" -and $overwrite -ne "Y") {
+                throw "Tag already exists and overwrite not confirmed"
             }
-            continue
         }
         
-        return $inputVersion
-    } while ($true)
+        return $autoVersion
+        
+    } catch {
+        Write-Warning "Failed to get version from nbgv: $($_.Exception.Message)"
+        Write-ColorOutput "Falling back to manual version input..." $Yellow
+        
+        # Fallback to manual input
+        Write-ColorOutput "`nVersion format examples:" $Yellow
+        Write-ColorOutput "  ? 1.0.0 (release)" $Yellow
+        Write-ColorOutput "  ? 1.2.3-beta (pre-release)" $Yellow
+        Write-ColorOutput "  ? 2.0.0-alpha.1 (pre-release)" $Yellow
+        
+        do {
+            $inputVersion = Read-Host "`nEnter version to publish (without 'v' prefix)"
+            if ([string]::IsNullOrWhiteSpace($inputVersion)) {
+                Write-Warning "Version cannot be empty"
+                continue
+            }
+            
+            # Basic version validation
+            if ($inputVersion -notmatch '^\d+\.\d+\.\d+(-[\w\d\.-]+)?$') {
+                Write-Warning "Invalid version format. Use semantic versioning (e.g., 1.0.0, 1.2.3-beta)"
+                continue
+            }
+            
+            $tag = "v$inputVersion"
+            
+            # Check if tag already exists
+            $existingTag = git tag -l $tag
+            if ($existingTag) {
+                Write-Warning "Tag '$tag' already exists"
+                $overwrite = Read-Host "Overwrite existing tag? (y/N)"
+                if ($overwrite -eq "y" -or $overwrite -eq "Y") {
+                    return $inputVersion
+                }
+                continue
+            }
+            
+            return $inputVersion
+        } while ($true)
+    }
 }
 
 function Invoke-GitTag {
