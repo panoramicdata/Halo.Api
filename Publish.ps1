@@ -66,8 +66,10 @@ function Write-ColorOutput {
         [string]$Message,
         [string]$Color = $Reset
     )
-    # Use Write-Output instead of Write-Host for better PowerShell practices
-    Write-Output "$Color$Message$Reset"
+    # Use Write-Information for display output to avoid capturing in variables
+    # This satisfies Codacy while maintaining proper PowerShell output behavior
+    $InformationPreference = 'Continue'
+    Write-Information "$Color$Message$Reset" -InformationAction Continue
 }
 
 function Write-Step {
