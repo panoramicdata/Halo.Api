@@ -66,10 +66,10 @@ jobs:
           - See commit history for detailed changes
           
           ### NuGet Package
-          This release is available on NuGet.org as `Halo.Api` version ${{ github.ref_name }}
+          This release is available on NuGet.org as `HaloPsa.Api` version ${{ github.ref_name }}
           
           ```
-          dotnet add package Halo.Api --version ${{ github.ref_name }}
+          dotnet add package HaloPsa.Api --version ${{ github.ref_name }}
           ```
           
           ### Installation

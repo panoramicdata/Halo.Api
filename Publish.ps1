@@ -153,41 +153,74 @@ function Invoke-Tests {
     Write-Step "Running all tests..."
     Write-ColorOutput "?? Test execution started..." $Cyan
     
-    # Run tests with detailed output
-    $testOutput = dotnet test --configuration Release --no-build --verbosity normal --logger "console;verbosity=detailed" 2>&1
+    # Run tests with detailed output and capture both stdout and stderr
+    $testResult = dotnet test --configuration Release --no-build --verbosity normal 2>&1
     $testExitCode = $LASTEXITCODE
     
-    # Parse test results
-    $testOutput | ForEach-Object { Write-Host $_ }
+    # Display the test output
+    $testResult | ForEach-Object { Write-Host $_ }
     
     if ($testExitCode -ne 0) {
         Write-Error "Tests failed with exit code $testExitCode"
         throw "Test execution failed"
     }
     
-    # Extract test summary from output
-    $summaryLine = $testOutput | Where-Object { $_ -match "Test run summary:" } | Select-Object -Last 1
-    $totalLine = $testOutput | Where-Object { $_ -match "total:" } | Select-Object -Last 1
-    $succeededLine = $testOutput | Where-Object { $_ -match "succeeded:" } | Select-Object -Last 1
-    $failedLine = $testOutput | Where-Object { $_ -match "failed:" } | Select-Object -Last 1
-    $skippedLine = $testOutput | Where-Object { $_ -match "skipped:" } | Select-Object -Last 1
+    # Look for the test summary in the output
+    $summaryFound = $false
+    $totalTests = 0
+    $failedTests = 0
+    $succeededTests = 0
+    $skippedTests = 0
     
-    # Validate 100% test success rate
-    if ($failedLine -and $failedLine -match "failed:\s*(\d+)" -and [int]$Matches[1] -gt 0) {
-        Write-Error "Found $($Matches[1]) failed tests - 100% success rate required"
+    # Parse the test output for results
+    foreach ($line in $testResult) {
+        if ($line -match "Test run summary:\s*(\w+)") {
+            $summaryFound = $true
+            $testStatus = $Matches[1]
+            if ($testStatus -eq "Failed") {
+                Write-Error "Test run summary indicates failure"
+                throw "Test execution failed"
+            }
+        }
+        
+        if ($line -match "total:\s*(\d+)") {
+            $totalTests = [int]$Matches[1]
+        }
+        
+        if ($line -match "failed:\s*(\d+)") {
+            $failedTests = [int]$Matches[1]
+        }
+        
+        if ($line -match "succeeded:\s*(\d+)") {
+            $succeededTests = [int]$Matches[1]
+        }
+        
+        if ($line -match "skipped:\s*(\d+)") {
+            $skippedTests = [int]$Matches[1]
+        }
+    }
+    
+    # Validate results
+    if ($failedTests -gt 0) {
+        Write-Error "Found $failedTests failed tests - 100% success rate required"
         throw "Test failures detected"
     }
     
-    if ($skippedLine -and $skippedLine -match "skipped:\s*(\d+)" -and [int]$Matches[1] -gt 0) {
-        Write-Warning "Found $($Matches[1]) skipped tests"
+    if ($skippedTests -gt 0) {
+        Write-Warning "Found $skippedTests skipped tests"
         $continue = Read-Host "Skipped tests found. Continue with publish? (y/N)"
         if ($continue -ne "y" -and $continue -ne "Y") {
             throw "Aborted due to skipped tests"
         }
     }
     
+    # If we got here and exit code was 0, tests passed
     Write-Success "All tests passed! ?"
-    if ($totalLine) { Write-ColorOutput "Test Summary: $totalLine" $Green }
+    if ($totalTests -gt 0) {
+        Write-ColorOutput "Test Results: $succeededTests/$totalTests tests succeeded, $failedTests failed, $skippedTests skipped" $Green
+    } else {
+        Write-ColorOutput "Test execution completed successfully" $Green
+    }
 }
 
 function Get-VersionInput {
@@ -323,7 +356,7 @@ function Main {
         
         Write-Success "`n?? Publication process initiated successfully!"
         Write-ColorOutput "The NuGet package will be available shortly at:" $Green
-        Write-ColorOutput "https://www.nuget.org/packages/Halo.Api/$versionToPublish" $Blue
+        Write-ColorOutput "https://www.nuget.org/packages/HaloPsa.Api/$versionToPublish" $Blue
         
     } catch {
         Write-Error "`n?? Publication failed: $($_.Exception.Message)"
