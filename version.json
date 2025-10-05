@@ -1,7 +1,7 @@
 {
-	"version": "2.196",
+	"version": "2.197",
 	"publicReleaseRefSpec": [
 		"^refs/heads/main$",
-		"^refs/tags/2\\.\\d+.\\d+"
+		"^refs/tags/v2\\.\\d+\\.\\d+"
 	]
 }
