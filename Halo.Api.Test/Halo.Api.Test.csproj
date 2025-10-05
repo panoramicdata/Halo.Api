@@ -4,14 +4,15 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<OutputType>Exe</OutputType>
 		<IsPackable>false</IsPackable>
-
-		 <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
-
-		 <UserSecretsId>4b5a486e-641f-4a44-b583-4419dbb564a9</UserSecretsId>
-		<!-- 1. You must add dotnet.config specifying the test runner to be Microsoft.Testing.Platform -->
-		<!-- For more information, see https://aka.ms/dotnet-test/mtp and https://xunit.net/docs/getting-started/v3/microsoft-testing-platform -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<UserSecretsId>4b5a486e-641f-4a44-b583-4419dbb564a9</UserSecretsId>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+		<WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
+		<NoWarn>CS1591</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>

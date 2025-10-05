@@ -1,31 +1,34 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+
+using Halo.Api.Infrastructure;
 using Halo.Api.Interfaces;
+using Refit;
 
 namespace Halo.Api.Test;
 
 /// <summary>
 /// Abstract base class for tests that provides common dependencies
 /// </summary>
-public abstract class TestBase
+public abstract class TestBase(IntegrationTestFixture fixture)
 {
+	/// <summary>
+	/// Gets the test fixture for creating fresh client instances
+	/// </summary>
+	protected readonly IntegrationTestFixture _fixture = fixture;
+
 	/// <summary>
 	/// Gets the Halo API client for testing
 	/// </summary>
-	protected IHaloClient HaloClient { get; }
+	protected IHaloClient HaloClient { get; } = fixture.GetHaloClient();
 
 	/// <summary>
 	/// Gets the logger for test output and diagnostics
 	/// </summary>
-	protected ILogger Logger { get; }
+	protected ILogger Logger { get; } = fixture.Logger;
 
 	/// <summary>
-	/// Initializes a new instance of the TestBase class
+	/// Gets a cancellation token for test operations with a reasonable timeout
 	/// </summary>
-	/// <param name="fixture">The integration test fixture containing dependencies</param>
-	protected TestBase(IntegrationTestFixture fixture)
-	{
-		ArgumentNullException.ThrowIfNull(fixture);
-		
-		HaloClient = fixture.GetHaloClient();
-		Logger = fixture.Logger;
-	}
+	protected static CancellationToken CancellationToken { get; } = new CancellationTokenSource(TimeSpan.FromMinutes(2)).Token;
 }

@@ -1,28 +1,49 @@
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Halo.Api.Infrastructure;
 
 /// <summary>
-/// HTTP message handler that manages OAuth2 authentication for Halo API requests
+/// HTTP message handler that manages OAuth2 authentication for Halo API requests using client credentials flow
 /// </summary>
-internal sealed class AuthenticationHandler(HaloClientOptions options) : DelegatingHandler
+internal sealed class AuthenticationHandler : DelegatingHandler
 {
 	private static readonly JsonSerializerOptions JsonOptions = new()
 	{
 		PropertyNameCaseInsensitive = true
 	};
 
-	private readonly HaloClientOptions _options = options;
+	private readonly HaloClientOptions _options;
 	private readonly SemaphoreSlim _tokenSemaphore = new(1, 1);
+	private readonly HttpClient _authHttpClient; // Separate client for auth requests
 	private string? _accessToken;
 	private DateTime _tokenExpiry = DateTime.MinValue;
+
+	public AuthenticationHandler(HaloClientOptions options)
+	{
+		_options = options ?? throw new ArgumentNullException(nameof(options));
+		
+		// Create a separate HttpClient for authentication requests
+		// This avoids circular dependencies with the main client
+		_authHttpClient = new HttpClient()
+		{
+			BaseAddress = new Uri(_options.EffectiveBaseUrl),
+			Timeout = _options.RequestTimeout
+		};
+	}
 
 	protected override async Task<HttpResponseMessage> SendAsync(
 		HttpRequestMessage request,
 		CancellationToken cancellationToken)
 	{
+		// Don't intercept auth requests to avoid infinite loops
+		if (request.RequestUri?.PathAndQuery.StartsWith("/auth", StringComparison.OrdinalIgnoreCase) == true)
+		{
+			return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+		}
+
 		// Ensure we have a valid access token
 		await EnsureValidTokenAsync(cancellationToken).ConfigureAwait(false);
 
@@ -37,9 +58,7 @@ internal sealed class AuthenticationHandler(HaloClientOptions options) : Delegat
 		// If we get a 401, try to refresh the token once
 		if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && !string.IsNullOrEmpty(_accessToken))
 		{
-#pragma warning disable CA1848 // Use LoggerMessage delegates for better performance
 			_options.Logger?.LogWarning("Received 401 Unauthorized, attempting to refresh token");
-#pragma warning restore CA1848
 
 			// Clear the current token and get a new one
 			_accessToken = null;
@@ -47,16 +66,54 @@ internal sealed class AuthenticationHandler(HaloClientOptions options) : Delegat
 
 			await EnsureValidTokenAsync(cancellationToken).ConfigureAwait(false);
 
-			// Update the authorization header and retry
+			// Create a new request message for retry (HttpRequestMessage can only be sent once)
 			if (!string.IsNullOrEmpty(_accessToken))
 			{
-				request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+				var retryRequest = await CloneHttpRequestMessageAsync(request);
+				retryRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
+				
 				response.Dispose(); // Dispose the 401 response
-				response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+				response = await base.SendAsync(retryRequest, cancellationToken).ConfigureAwait(false);
 			}
 		}
 
 		return response;
+	}
+
+	/// <summary>
+	/// Clones an HttpRequestMessage for retry purposes since HttpRequestMessage can only be sent once
+	/// </summary>
+	private static async Task<HttpRequestMessage> CloneHttpRequestMessageAsync(HttpRequestMessage original)
+	{
+		var clone = new HttpRequestMessage(original.Method, original.RequestUri);
+
+		// Copy headers
+		foreach (var header in original.Headers)
+		{
+			clone.Headers.TryAddWithoutValidation(header.Key, header.Value);
+		}
+
+		// Copy content if present
+		if (original.Content != null)
+		{
+			var contentBytes = await original.Content.ReadAsByteArrayAsync();
+			clone.Content = new ByteArrayContent(contentBytes);
+
+			// Copy content headers
+			foreach (var header in original.Content.Headers)
+			{
+				clone.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+			}
+		}
+
+		// Copy other properties
+		clone.Version = original.Version;
+		foreach (var property in original.Options)
+		{
+			clone.Options.Set(new HttpRequestOptionsKey<object?>(property.Key), property.Value);
+		}
+
+		return clone;
 	}
 
 	private async Task EnsureValidTokenAsync(CancellationToken cancellationToken)
@@ -86,52 +143,48 @@ internal sealed class AuthenticationHandler(HaloClientOptions options) : Delegat
 
 	private async Task RefreshTokenAsync(CancellationToken cancellationToken)
 	{
-#pragma warning disable CA1848 // Use LoggerMessage delegates for better performance
-		_options.Logger?.LogDebug("Refreshing Halo API access token");
-#pragma warning restore CA1848
-
+		_options.Logger?.LogDebug("Refreshing Halo API access token using client credentials");
 		try
 		{
-			var tokenRequest = new HttpRequestMessage(HttpMethod.Post, "/auth/token")
+			var formData = new FormUrlEncodedContent(new Dictionary<string, string>
 			{
-				Content = new FormUrlEncodedContent(new Dictionary<string, string>
-				{
-					["grant_type"] = "client_credentials",
-					["client_id"] = _options.HaloClientId,
-					["client_secret"] = _options.HaloClientSecret,
-					["scope"] = "all"
-				})
-			};
+				["grant_type"] = "client_credentials",
+				["client_id"] = _options.HaloClientId,
+				["client_secret"] = _options.HaloClientSecret,
+				["scope"] = "all"
+			});
 
-			var response = await base.SendAsync(tokenRequest, cancellationToken).ConfigureAwait(false);
+			// Use the separate auth client to avoid circular dependencies
+			var response = await _authHttpClient.PostAsync("/auth/token", formData, cancellationToken).ConfigureAwait(false);
 
 			if (!response.IsSuccessStatusCode)
 			{
 				var errorContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+				_options.Logger?.LogError("Authentication failed: {StatusCode} - {Content}", response.StatusCode, errorContent);
 				throw new AuthenticationException(
 					$"Failed to obtain access token. Status: {response.StatusCode}, Content: {errorContent}");
 			}
 
 			var responseContent = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+			
+			// Log the raw response for debugging
+			_options.Logger?.LogDebug("Token response: {Response}", responseContent);
+			
 			var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseContent, JsonOptions);
 
 			if (tokenResponse == null || string.IsNullOrEmpty(tokenResponse.AccessToken))
 			{
-				throw new AuthenticationException("Invalid token response received from Halo API");
+				throw new AuthenticationException($"Invalid token response received from Halo API. Response: {responseContent}");
 			}
 
 			_accessToken = tokenResponse.AccessToken;
 			_tokenExpiry = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn - 60); // 60-second buffer
 
-#pragma warning disable CA1848 // Use LoggerMessage delegates for better performance
 			_options.Logger?.LogDebug("Successfully refreshed Halo API access token, expires at {Expiry}", _tokenExpiry);
-#pragma warning restore CA1848
 		}
-		catch (Exception ex) when (!(ex is AuthenticationException))
+		catch (Exception ex) when (ex is not AuthenticationException)
 		{
-#pragma warning disable CA1848 // Use LoggerMessage delegates for better performance
 			_options.Logger?.LogError(ex, "Failed to refresh Halo API access token");
-#pragma warning restore CA1848
 			throw new AuthenticationException("Failed to obtain access token from Halo API", ex);
 		}
 	}
@@ -141,14 +194,21 @@ internal sealed class AuthenticationHandler(HaloClientOptions options) : Delegat
 		if (disposing)
 		{
 			_tokenSemaphore.Dispose();
+			_authHttpClient.Dispose();
 		}
+
 		base.Dispose(disposing);
 	}
 
 	private sealed record TokenResponse
 	{
+		[JsonPropertyName("access_token")]
 		public string AccessToken { get; init; } = "";
+		
+		[JsonPropertyName("token_type")]
 		public string TokenType { get; init; } = "";
+		
+		[JsonPropertyName("expires_in")]
 		public int ExpiresIn { get; init; }
 	}
 }

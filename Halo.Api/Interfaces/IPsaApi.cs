@@ -11,6 +11,11 @@ public interface IPsaApi
 	ITicketsApi Tickets { get; }
 
 	/// <summary>
+	/// Gets the TicketTypes API for ticket type management operations
+	/// </summary>
+	ITicketTypesApi TicketTypes { get; }
+
+	/// <summary>
 	/// Gets the Users API for user management operations
 	/// </summary>
 	IUsersApi Users { get; }

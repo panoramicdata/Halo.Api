@@ -1,6 +1,4 @@
 using AwesomeAssertions;
-using Halo.Api.Infrastructure;
-using Microsoft.Extensions.Logging;
 
 namespace Halo.Api.Test.Infrastructure;
 
@@ -62,7 +60,7 @@ public class HaloClientInfrastructureTests(IntegrationTestFixture fixture)
 	public void HaloClient_WithCustomBaseUrl_UsesCustomUrl()
 	{
 		// Arrange
-		var customBaseUrl = "https://custom.haloitsm.com";
+		var customBaseUrl = "https://custom.halopsa.com";
 		var options = new HaloClientOptions
 		{
 			HaloAccount = _fixture.Configuration["HaloApi:HaloAccount"] ?? throw new InvalidOperationException("HaloApi:HaloAccount not found"),

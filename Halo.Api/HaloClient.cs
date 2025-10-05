@@ -1,5 +1,6 @@
 ﻿using Halo.Api.Infrastructure;
 using Halo.Api.Interfaces;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Halo.Api;
 
@@ -10,9 +11,6 @@ public class HaloClient : IHaloClient, IDisposable
 {
 	private readonly HaloClientOptions _options;
 	private readonly HttpClient _httpClient;
-	private readonly Lazy<IPsaApi> _psa;
-	private readonly Lazy<IServiceDeskApi> _serviceDesk;
-	private readonly Lazy<ISystemApi> _system;
 	private bool _disposed;
 
 	/// <summary>
@@ -29,25 +27,25 @@ public class HaloClient : IHaloClient, IDisposable
 		_httpClient = CreateHttpClient();
 
 		// Initialize API modules lazily
-		_psa = new Lazy<IPsaApi>(() => new PsaApi(_httpClient));
-		_serviceDesk = new Lazy<IServiceDeskApi>(() => new ServiceDeskApi(_httpClient));
-		_system = new Lazy<ISystemApi>(() => new SystemApi(_httpClient));
+		Psa = new Lazy<IPsaApi>(() => new PsaApi(_httpClient)).Value;
+		ServiceDesk = new Lazy<IServiceDeskApi>(() => new ServiceDeskApi(_httpClient)).Value;
+		System = new Lazy<ISystemApi>(() => new SystemApi(_httpClient)).Value;
 	}
 
 	/// <summary>
 	/// Gets the PSA (Professional Services Automation) API module
 	/// </summary>
-	public IPsaApi Psa => _psa.Value;
+	public IPsaApi Psa { get; private set; }
 
 	/// <summary>
 	/// Gets the ServiceDesk API module
 	/// </summary>
-	public IServiceDeskApi ServiceDesk => _serviceDesk.Value;
+	public IServiceDeskApi ServiceDesk { get; private set; }
 
 	/// <summary>
 	/// Gets the System API module for configuration and administration
 	/// </summary>
-	public ISystemApi System => _system.Value;
+	public ISystemApi System { get; private set; }
 
 	/// <summary>
 	/// Gets the Halo account identifier
@@ -63,8 +61,12 @@ public class HaloClient : IHaloClient, IDisposable
 	{
 		var handler = new HttpClientHandler();
 
-		// Build the handler chain (order matters - authentication should be innermost)
-		DelegatingHandler chain = new AuthenticationHandler(_options);
+		// Build the handler chain (order matters - authentication should be innermost, error handling outermost)
+		DelegatingHandler chain = new AuthenticationHandler(_options)
+		{
+			// Set the innermost handler (AuthenticationHandler) to point to HttpClientHandler
+			InnerHandler = handler
+		};
 
 		if (_options.MaxRetryAttempts > 0)
 		{
@@ -73,25 +75,32 @@ public class HaloClient : IHaloClient, IDisposable
 				_options.RetryDelay,
 				_options.UseExponentialBackoff,
 				_options.MaxRetryDelay,
-				_options.Logger);
-			retryHandler.InnerHandler = chain;
+				_options.Logger)
+			{
+				InnerHandler = chain
+			};
 			chain = retryHandler;
 		}
 
 		if (_options.EnableRequestLogging || _options.EnableResponseLogging)
 		{
 			var loggingHandler = new LoggingHandler(
-				_options.Logger,
+				_options.Logger ?? NullLogger.Instance,
 				_options.EnableRequestLogging,
-				_options.EnableResponseLogging);
-			loggingHandler.InnerHandler = chain;
+				_options.EnableResponseLogging)
+			{
+				InnerHandler = chain
+			};
 			chain = loggingHandler;
 		}
 
-		// Set the innermost handler
-		chain.InnerHandler = handler;
+		// Add error handling as the outermost handler (wraps everything)
+		var errorHandler = new ErrorHandler(_options.Logger)
+		{
+			InnerHandler = chain
+		};
 
-		var httpClient = new HttpClient(chain)
+		var httpClient = new HttpClient(errorHandler)
 		{
 			BaseAddress = new Uri(_options.EffectiveBaseUrl),
 			Timeout = _options.RequestTimeout
@@ -129,68 +138,3 @@ public class HaloClient : IHaloClient, IDisposable
 		}
 	}
 }
-
-/// <summary>
-/// Implementation of PSA API module
-/// </summary>
-internal sealed class PsaApi(HttpClient httpClient) : IPsaApi
-{
-	private readonly HttpClient _httpClient = httpClient;
-
-	public ITicketsApi Tickets => new TicketsApi(_httpClient);
-	public IUsersApi Users => new UsersApi(_httpClient);
-	public IClientsApi Clients => new ClientsApi(_httpClient);
-	public IActionsApi Actions => new ActionsApi(_httpClient);
-	public IAttachmentsApi Attachments => new AttachmentsApi(_httpClient);
-	public IAssetsApi Assets => new AssetsApi(_httpClient);
-	public IProjectsApi Projects => new ProjectsApi(_httpClient);
-	public IReportsApi Reports => new ReportsApi(_httpClient);
-}
-
-/// <summary>
-/// Implementation of ServiceDesk API module
-/// </summary>
-internal sealed class ServiceDeskApi(HttpClient httpClient) : IServiceDeskApi
-{
-	private readonly HttpClient _httpClient = httpClient;
-
-	public IKnowledgeBaseApi KnowledgeBase => new KnowledgeBaseApi(_httpClient);
-	public IServiceCatalogApi ServiceCatalog => new ServiceCatalogApi(_httpClient);
-	public IWorkflowsApi Workflows => new WorkflowsApi(_httpClient);
-	public IApprovalsApi Approvals => new ApprovalsApi(_httpClient);
-}
-
-/// <summary>
-/// Implementation of System API module
-/// </summary>
-internal sealed class SystemApi(HttpClient httpClient) : ISystemApi
-{
-	private readonly HttpClient _httpClient = httpClient;
-
-	public IConfigurationApi Configuration => new ConfigurationApi(_httpClient);
-	public IIntegrationApi Integration => new IntegrationApi(_httpClient);
-	public IAuditApi Audit => new AuditApi(_httpClient);
-	public ICustomFieldsApi CustomFields => new CustomFieldsApi(_httpClient);
-}
-
-// Placeholder implementations - will be replaced with Refit interfaces in Phase 1.2
-#pragma warning disable CS9113 // Parameter is unread
-#pragma warning disable IDE0060 // Remove unused parameter
-internal sealed class TicketsApi(HttpClient httpClient) : ITicketsApi { }
-internal sealed class UsersApi(HttpClient httpClient) : IUsersApi { }
-internal sealed class ClientsApi(HttpClient httpClient) : IClientsApi { }
-internal sealed class ActionsApi(HttpClient httpClient) : IActionsApi { }
-internal sealed class AttachmentsApi(HttpClient httpClient) : IAttachmentsApi { }
-internal sealed class AssetsApi(HttpClient httpClient) : IAssetsApi { }
-internal sealed class ProjectsApi(HttpClient httpClient) : IProjectsApi { }
-internal sealed class ReportsApi(HttpClient httpClient) : IReportsApi { }
-internal sealed class KnowledgeBaseApi(HttpClient httpClient) : IKnowledgeBaseApi { }
-internal sealed class ServiceCatalogApi(HttpClient httpClient) : IServiceCatalogApi { }
-internal sealed class WorkflowsApi(HttpClient httpClient) : IWorkflowsApi { }
-internal sealed class ApprovalsApi(HttpClient httpClient) : IApprovalsApi { }
-internal sealed class ConfigurationApi(HttpClient httpClient) : IConfigurationApi { }
-internal sealed class IntegrationApi(HttpClient httpClient) : IIntegrationApi { }
-internal sealed class AuditApi(HttpClient httpClient) : IAuditApi { }
-internal sealed class CustomFieldsApi(HttpClient httpClient) : ICustomFieldsApi { }
-#pragma warning restore IDE0060 // Remove unused parameter
-#pragma warning restore CS9113 // Parameter is unread

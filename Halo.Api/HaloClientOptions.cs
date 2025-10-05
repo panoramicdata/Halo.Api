@@ -79,7 +79,7 @@ public partial class HaloClientOptions
 	/// <summary>
 	/// Gets the effective base URL for the Halo API
 	/// </summary>
-	internal string EffectiveBaseUrl => BaseUrl ?? $"https://{HaloAccount}.haloitsm.com";
+	internal string EffectiveBaseUrl => BaseUrl ?? $"https://{HaloAccount}.halopsa.com";
 
 	internal void Validate()
 	{

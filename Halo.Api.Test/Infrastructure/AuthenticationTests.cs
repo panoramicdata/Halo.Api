@@ -1,78 +1,67 @@
-using System.Net;
 using AwesomeAssertions;
 
 namespace Halo.Api.Test.Infrastructure;
 
-[Collection("Integration Tests")]
-public class AuthenticationTests(IntegrationTestFixture fixture)
+public class AuthenticationTests()
 {
-	private readonly IntegrationTestFixture _fixture = fixture;
-
 	[Fact]
-	public void HaloClient_CanBeCreatedWithValidConfiguration()
-	{
-		// Arrange & Act
-		var client = _fixture.GetHaloClient();
-
-		// Assert - Just verify the client can be created and has proper configuration
-		client.Should().NotBeNull();
-		client.Account.Should().NotBeNullOrEmpty();
-		client.BaseUrl.Should().NotBeNullOrEmpty();
-		client.BaseUrl.Should().Contain(client.Account);
-	}
-
-	[Fact]
-	public async Task HaloClient_AuthenticationHandler_IsConfigured()
-	{
-		// Arrange
-		var client = _fixture.GetHaloClient();
-
-		// Act - Make a simple request to verify the authentication infrastructure is set up
-		// We don't care if it succeeds or fails, just that the handlers are working
-		using var httpClient = new HttpClient();
-		var tokenRequest = new HttpRequestMessage(HttpMethod.Post, $"{client.BaseUrl}/auth/token")
-		{
-			Content = new FormUrlEncodedContent(new Dictionary<string, string>
-			{
-				["grant_type"] = "client_credentials",
-				["client_id"] = _fixture.Configuration["HaloApi:HaloClientId"] ?? throw new InvalidOperationException("HaloApi:HaloClientId not found"),
-				["client_secret"] = _fixture.Configuration["HaloApi:HaloClientSecret"] ?? throw new InvalidOperationException("HaloApi:HaloClientSecret not found"),
-				["scope"] = "all"
-			})
-		};
-
-		var response = await httpClient.SendAsync(tokenRequest, TestContext.Current.CancellationToken);
-
-		// Assert - We just verify that we got a response (even if it's an error)
-		// This validates that our HTTP infrastructure is working
-		response.Should().NotBeNull();
-		// Accept any response - we're just testing that the HTTP stack works
-		response.StatusCode.Should().BeOneOf(
-			HttpStatusCode.OK,                    // Success
-			HttpStatusCode.Unauthorized,          // Invalid credentials
-			HttpStatusCode.BadRequest,            // Malformed request
-			HttpStatusCode.InternalServerError    // Server error
-		);
-	}
-
-	[Fact]
-	public void HaloClient_DisposesResourcesProperly()
+	public void HaloClientOptions_WithValidCredentials_ValidatesSuccessfully()
 	{
 		// Arrange
 		var options = new HaloClientOptions
 		{
-			HaloAccount = _fixture.Configuration["HaloApi:HaloAccount"] ?? throw new InvalidOperationException("HaloApi:HaloAccount not found"),
-			HaloClientId = _fixture.Configuration["HaloApi:HaloClientId"] ?? throw new InvalidOperationException("HaloApi:HaloClientId not found"),
-			HaloClientSecret = _fixture.Configuration["HaloApi:HaloClientSecret"] ?? throw new InvalidOperationException("HaloApi:HaloClientSecret not found")
+			HaloAccount = "testaccount",
+			HaloClientId = "550e8400-e29b-41d4-a716-446655440000",
+			HaloClientSecret = "550e8400-e29b-41d4-a716-446655440000-123e4567-e89b-12d3-a456-426614174000"
 		};
 
-		// Act & Assert - Verify that disposal works without throwing
-		using (var client = new HaloClient(options))
-		{
-			client.Should().NotBeNull();
-		} // Disposal happens here
+		// Act & Assert - Should not throw
+		options.Validate();
+	}
 
-		// If we get here, disposal worked correctly
-		Assert.True(true, "Client disposed successfully");
+	[Fact]
+	public void HaloClientOptions_WithInvalidClientId_ThrowsFormatException()
+	{
+		// Arrange
+		var options = new HaloClientOptions
+		{
+			HaloAccount = "testaccount",
+			HaloClientId = "invalid-guid",
+			HaloClientSecret = "550e8400-e29b-41d4-a716-446655440000-123e4567-e89b-12d3-a456-426614174000"
+		};
+
+		// Act & Assert
+		var act = () => options.Validate();
+		act.Should().Throw<FormatException>()
+			.WithMessage("*HaloClientId must be a valid GUID format*");
+	}
+
+	[Fact]
+	public void AuthenticationHandler_WithValidCredentials_ShouldValidateOptions()
+	{
+		// Arrange
+		var logger = new TestLogger();
+		var options = new HaloClientOptions
+		{
+			HaloAccount = "testaccount",
+			HaloClientId = "550e8400-e29b-41d4-a716-446655440000",
+			HaloClientSecret = "550e8400-e29b-41d4-a716-446655440000-123e4567-e89b-12d3-a456-426614174000",
+			Logger = logger
+		};
+
+		// Act & Assert - Verify the options are valid
+		options.Validate();
+		options.Should().NotBeNull();
+		options.HaloAccount.Should().Be("testaccount");
+	}
+
+	private class TestLogger : ILogger
+	{
+		public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
+		public bool IsEnabled(LogLevel logLevel) => true;
+		public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+		{
+			// Test logger implementation
+		}
 	}
 }

@@ -31,7 +31,7 @@ public class IntegrationTests(IntegrationTestFixture fixture, ITestOutputHelper 
 	public void Configuration_ShouldNotBeNull()
 	{
 		// Arrange & Act
-		var configuration = fixture.Configuration;
+		var configuration = _fixture.Configuration;
 
 		// Assert
 		configuration.Should().NotBeNull();

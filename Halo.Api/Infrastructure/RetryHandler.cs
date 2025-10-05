@@ -48,13 +48,11 @@ internal sealed class RetryHandler(
 				{
 					if (attempt > 0)
 					{
-#pragma warning disable CA1848 // Use LoggerMessage delegates for better performance
 						_logger?.LogInformation(
 							"HTTP request succeeded on attempt {Attempt} for {Method} {Uri}",
 							attempt + 1,
 							request.Method,
 							request.RequestUri);
-#pragma warning restore CA1848
 					}
 
 					return response;
@@ -65,14 +63,12 @@ internal sealed class RetryHandler(
 
 				if (attempt == _maxRetryAttempts)
 				{
-#pragma warning disable CA1848 // Use LoggerMessage delegates for better performance
 					_logger?.LogWarning(
 						"HTTP request failed after {MaxAttempts} attempts for {Method} {Uri} with status {StatusCode}",
 						_maxRetryAttempts + 1,
 						request.Method,
 						request.RequestUri,
 						response.StatusCode);
-#pragma warning restore CA1848
 
 					// Create a new response for the final failure
 					return new HttpResponseMessage(response.StatusCode)
@@ -82,7 +78,6 @@ internal sealed class RetryHandler(
 					};
 				}
 
-#pragma warning disable CA1848 // Use LoggerMessage delegates for better performance
 				_logger?.LogWarning(
 					"HTTP request failed on attempt {Attempt}, retrying in {Delay}ms for {Method} {Uri} (Status: {StatusCode})",
 					attempt + 1,
@@ -90,7 +85,6 @@ internal sealed class RetryHandler(
 					request.Method,
 					request.RequestUri,
 					response.StatusCode);
-#pragma warning restore CA1848
 			}
 			catch (Exception ex) when (IsRetryableException(ex))
 			{
@@ -98,25 +92,20 @@ internal sealed class RetryHandler(
 
 				if (attempt == _maxRetryAttempts)
 				{
-#pragma warning disable CA1848 // Use LoggerMessage delegates for better performance
 					_logger?.LogError(ex,
 						"HTTP request failed after {MaxAttempts} attempts for {Method} {Uri}",
 						_maxRetryAttempts + 1,
 						request.Method,
 						request.RequestUri);
-#pragma warning restore CA1848
-
 					throw;
 				}
 
-#pragma warning disable CA1848 // Use LoggerMessage delegates for better performance
 				_logger?.LogWarning(ex,
 					"HTTP request failed on attempt {Attempt}, retrying in {Delay}ms for {Method} {Uri}",
 					attempt + 1,
 					CalculateDelay(attempt).TotalMilliseconds,
 					request.Method,
 					request.RequestUri);
-#pragma warning restore CA1848
 			}
 
 			// Wait before retrying

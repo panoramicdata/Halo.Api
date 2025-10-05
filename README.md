@@ -1,4 +1,4 @@
-# Halo PSA API .NET Library
+﻿# Halo PSA API .NET Library
 
 [![NuGet Version](https://img.shields.io/nuget/v/Halo.Api)](https://www.nuget.org/packages/Halo.Api)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/Halo.Api)](https://www.nuget.org/packages/Halo.Api)
@@ -7,16 +7,22 @@
 
 A comprehensive, modern .NET library for interacting with the [Halo PSA](https://halopsa.com/) API. This library provides full coverage of the Halo PSA API with a clean, intuitive interface using modern C# patterns and best practices.
 
+## 📚 Official Documentation
+
+- **API Documentation**: [https://halo.haloservicedesk.com/apidoc/info](https://halo.haloservicedesk.com/apidoc/info)
+- **Authentication Guide**: [https://halo.haloservicedesk.com/apidoc/authentication/password](https://halo.haloservicedesk.com/apidoc/authentication/password)
+- **Halo PSA Official Site**: [https://haloservicedesk.com/halopsa](https://haloservicedesk.com/halopsa)
+
 ## Features
 
-- ?? **Complete API Coverage** - Full support for all Halo PSA endpoints
-- ?? **Modern .NET** - Built for .NET 9+ with modern C# features
-- ?? **Type Safety** - Strongly typed models and responses
-- ?? **Comprehensive Logging** - Built-in logging and request/response interception
-- ?? **Retry Logic** - Automatic retry with exponential backoff
-- ?? **Rich Documentation** - IntelliSense-friendly XML documentation
-- ?? **Thoroughly Tested** - Comprehensive unit and integration tests
-- ? **High Performance** - Optimized for efficiency and low memory usage
+- 🎯 **Complete API Coverage** - Full support for all Halo PSA endpoints
+- 🚀 **Modern .NET** - Built for .NET 9+ with modern C# features
+- 🔒 **Type Safety** - Strongly typed models and responses
+- 📝 **Comprehensive Logging** - Built-in logging and request/response interception
+- 🔄 **Retry Logic** - Automatic retry with exponential backoff
+- 📖 **Rich Documentation** - IntelliSense-friendly XML documentation
+- ✅ **Thoroughly Tested** - Comprehensive unit and integration tests
+- ⚡ **High Performance** - Optimized for efficiency and low memory usage
 
 ## Installation
 
@@ -36,16 +42,26 @@ Install-Package Halo.Api
 
 ### 1. Authentication Setup
 
-First, obtain your API credentials from your Halo PSA instance:
+Halo API uses **password-based authentication** with agent credentials. You'll need:
+
+1. **Halo Account Name** - Your instance identifier (e.g., "yourcompany" for "yourcompany.halopsa.com")
+2. **Client ID** - Your application's registered client ID (GUID format)
+3. **Username** - A Halo agent's username with API permissions
+4. **Password** - The agent's password
+5. **Tenant** - For hosted solutions, typically "Halo" (optional for on-premise)
+
+Refer to the [official authentication documentation](https://halo.haloservicedesk.com/apidoc/authentication/password) for detailed guidance on obtaining these credentials.
 
 ```csharp
 using Halo.Api;
 
 var options = new HaloClientOptions
 {
-    HaloAccount = "your-account-name",
-    HaloClientId = "your-client-id-guid",
-    HaloClientSecret = "your-client-secret-two-guids"
+    HaloAccount = "your-account-name",      // e.g., "yourcompany" 
+    HaloClientId = "your-client-id-guid",   // Application client ID
+    HaloUsername = "agent-username",        // Halo agent username
+    HaloPassword = "agent-password",        // Halo agent password
+    Tenant = "Halo"                        // For hosted solutions (optional)
 };
 
 var client = new HaloClient(options);
@@ -56,6 +72,10 @@ var client = new HaloClient(options);
 #### Working with Tickets
 
 ```csharp
+// Use a CancellationToken for all async operations
+using var cts = new CancellationTokenSource();
+var cancellationToken = cts.Token;
+
 // Get all open tickets
 var filter = new TicketFilter
 {
@@ -63,7 +83,7 @@ var filter = new TicketFilter
     Count = 50
 };
 
-var tickets = await client.Psa.Tickets.GetAllAsync(filter);
+var tickets = await client.Psa.Tickets.GetAllAsync(filter, cancellationToken);
 
 foreach (var ticket in tickets.Tickets)
 {
@@ -71,7 +91,7 @@ foreach (var ticket in tickets.Tickets)
 }
 
 // Get a specific ticket with details
-var ticket = await client.Psa.Tickets.GetByIdAsync(12345, includeDetails: true);
+var ticket = await client.Psa.Tickets.GetByIdAsync(12345, includeDetails: true, cancellationToken);
 Console.WriteLine($"Ticket: {ticket.Summary}");
 Console.WriteLine($"Status: {ticket.Status}");
 Console.WriteLine($"Assigned to: {ticket.AssignedAgent?.Name}");
@@ -86,7 +106,7 @@ var newTicket = new CreateTicketRequest
     TicketTypeId = 1
 };
 
-var createdTicket = await client.Psa.Tickets.CreateAsync(newTicket);
+var createdTicket = await client.Psa.Tickets.CreateAsync(newTicket, cancellationToken);
 Console.WriteLine($"Created ticket #{createdTicket.Id}");
 ```
 
@@ -100,10 +120,10 @@ var userFilter = new UserFilter
     IncludeActive = true
 };
 
-var users = await client.Psa.Users.GetAllAsync(userFilter);
+var users = await client.Psa.Users.GetAllAsync(userFilter, cancellationToken);
 
 // Get user details
-var user = await client.Psa.Users.GetByIdAsync(123, includeDetails: true);
+var user = await client.Psa.Users.GetByIdAsync(123, includeDetails: true, cancellationToken);
 Console.WriteLine($"User: {user.Name} ({user.EmailAddress})");
 
 // Create a new user
@@ -115,7 +135,7 @@ var newUser = new CreateUserRequest
     IsActive = true
 };
 
-var createdUser = await client.Psa.Users.CreateAsync(newUser);
+var createdUser = await client.Psa.Users.CreateAsync(newUser, cancellationToken);
 ```
 
 #### Working with Clients
@@ -128,10 +148,10 @@ var clientFilter = new ClientFilter
     Count = 100
 };
 
-var clients = await client.Psa.Clients.GetAllAsync(clientFilter);
+var clients = await client.Psa.Clients.GetAllAsync(clientFilter, cancellationToken);
 
 // Get client with additional details
-var clientDetails = await client.Psa.Clients.GetByIdAsync(123, includeDetails: true);
+var clientDetails = await client.Psa.Clients.GetByIdAsync(123, includeDetails: true, cancellationToken);
 Console.WriteLine($"Client: {clientDetails.Name}");
 Console.WriteLine($"Contact: {clientDetails.MainContact?.Name}");
 ```
@@ -145,7 +165,8 @@ var options = new HaloClientOptions
 {
     HaloAccount = "your-account",
     HaloClientId = "your-client-id",
-    HaloClientSecret = "your-client-secret",
+    HaloUsername = "your-username",
+    HaloPassword = "your-password",
     
     // Custom timeout
     RequestTimeout = TimeSpan.FromSeconds(30),
@@ -155,7 +176,10 @@ var options = new HaloClientOptions
     RetryDelay = TimeSpan.FromSeconds(1),
     
     // Custom base URL (if using on-premises)
-    BaseUrl = "https://your-instance.haloitsm.com"
+    BaseUrl = "https://your-instance.halopsa.com",
+    
+    // Custom scope (default is "all")
+    Scope = "tickets users clients"
 };
 
 var client = new HaloClient(options);
@@ -177,13 +201,25 @@ var logger = serviceProvider.GetRequiredService<ILogger<HaloClient>>();
 var options = new HaloClientOptions
 {
     // ... authentication details
-    Logger = logger
+    Logger = logger,
+    EnableRequestLogging = true,
+    EnableResponseLogging = true
 };
 
 var client = new HaloClient(options);
 ```
 
-### 4. Pagination and Large Result Sets
+### 4. Authentication Troubleshooting
+
+If you're experiencing authentication issues:
+
+1. **Verify Credentials**: Ensure the username/password can log into the Halo web interface
+2. **Check API Permissions**: The user account must have API access permissions in Halo
+3. **Validate Client ID**: Ensure your application is registered in Halo with the correct client ID
+4. **Tenant Parameter**: For hosted solutions, include the `Tenant = "Halo"` parameter
+5. **On-Premise vs Hosted**: On-premise installations may not require the tenant parameter
+
+### 5. Pagination and Large Result Sets
 
 ```csharp
 // Handle pagination automatically
@@ -200,7 +236,7 @@ do
         IncludeActive = true
     };
     
-    var response = await client.Psa.Tickets.GetAllAsync(filter);
+    var response = await client.Psa.Tickets.GetAllAsync(filter, cancellationToken);
     allTickets.AddRange(response.Tickets);
     
     pageNumber++;
@@ -211,12 +247,12 @@ do
 Console.WriteLine($"Retrieved {allTickets.Count} total tickets");
 ```
 
-### 5. Error Handling
+### 6. Error Handling
 
 ```csharp
 try
 {
-    var ticket = await client.Psa.Tickets.GetByIdAsync(99999);
+    var ticket = await client.Psa.Tickets.GetByIdAsync(99999, cancellationToken);
 }
 catch (HaloNotFoundException ex)
 {
@@ -225,6 +261,7 @@ catch (HaloNotFoundException ex)
 catch (HaloAuthenticationException ex)
 {
     Console.WriteLine($"Authentication failed: {ex.Message}");
+    Console.WriteLine("Check your username, password, and API permissions");
 }
 catch (HaloApiException ex)
 {
@@ -236,7 +273,7 @@ catch (HaloApiException ex)
 
 ## API Coverage
 
-This library provides comprehensive coverage of the Halo PSA API, organized into logical groups:
+This library provides comprehensive coverage of the Halo PSA API, organized into logical groups. For complete API endpoint documentation, refer to the [official API documentation](https://halo.haloservicedesk.com/apidoc/info).
 
 ### PSA Module (`client.Psa`)
 - **Tickets** - Full CRUD operations, filtering, actions, and workflow
@@ -267,7 +304,12 @@ public class HaloClientOptions
     // Required authentication
     public required string HaloAccount { get; init; }
     public required string HaloClientId { get; init; }
-    public required string HaloClientSecret { get; init; }
+    public required string HaloUsername { get; init; }
+    public required string HaloPassword { get; init; }
+    
+    // Optional authentication
+    public string? Tenant { get; init; } = null;  // For hosted solutions
+    public string? Scope { get; init; } = "all";  // API permissions scope
     
     // Optional configuration
     public string? BaseUrl { get; init; } = null;  // Uses default Halo cloud URL
@@ -282,6 +324,14 @@ public class HaloClientOptions
     public Dictionary<string, string> DefaultHeaders { get; init; } = [];
 }
 ```
+
+## API Reference
+
+For detailed API endpoint documentation, parameters, and response formats, please refer to the official resources:
+
+- 📖 **[Halo API Documentation](https://halo.haloservicedesk.com/apidoc/info)** - Complete API reference
+- 🔐 **[Authentication Guide](https://halo.haloservicedesk.com/apidoc/authentication/password)** - How to obtain and use API credentials
+- 🌐 **[Halo Service Desk](https://haloservicedesk.com/)** - Official product documentation
 
 ## Contributing
 
@@ -304,7 +354,9 @@ We welcome contributions from the community! Here's how you can help:
    dotnet user-secrets init
    dotnet user-secrets set "HaloApi:HaloAccount" "your-test-account"
    dotnet user-secrets set "HaloApi:HaloClientId" "your-test-client-id"
-   dotnet user-secrets set "HaloApi:HaloClientSecret" "your-test-client-secret"
+   dotnet user-secrets set "HaloApi:HaloUsername" "your-test-username"
+   dotnet user-secrets set "HaloApi:HaloPassword" "your-test-password"
+   dotnet user-secrets set "HaloApi:Tenant" "Halo"
    ```
 
 4. **Build and test**:
@@ -349,9 +401,10 @@ When reporting issues:
 
 ## Support
 
-- **Documentation**: [GitHub Wiki](https://github.com/panoramicdata/HaloPSA.Api/wiki)
-- **Issues**: [GitHub Issues](https://github.com/panoramicdata/HaloPSA.Api/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/panoramicdata/HaloPSA.Api/discussions)
+- **Official Documentation**: [Halo API Docs](https://halo.haloservicedesk.com/apidoc/info)
+- **GitHub Issues**: [Report Issues](https://github.com/panoramicdata/HaloPSA.Api/issues)
+- **GitHub Discussions**: [Community Support](https://github.com/panoramicdata/HaloPSA.Api/discussions)
+- **Halo Support**: Contact Halo Service Desk for API access and account issues
 
 ## License
 
@@ -359,7 +412,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Copyright
 
-Copyright � 2025 Panoramic Data Limited. All rights reserved.
+Copyright © 2025 Panoramic Data Limited. All rights reserved.
 
 ## Changelog
 
