@@ -59,14 +59,14 @@ public class HaloClientOptions
 - Always use file-scoped namespaces:
 ```csharp
 // Preferred
-namespace Halo.Api;
+namespace HaloPsa.Api;
 
 public class HaloClient
 {
 }
 
 // Instead of
-namespace Halo.Api
+namespace HaloPsa.Api
 {
     public class HaloClient
     {

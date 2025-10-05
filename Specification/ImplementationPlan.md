@@ -238,7 +238,7 @@ git push origin v1.0.0
 
 **Package Details**:
 - **Package ID**: `HaloPsa.Api`
-- **Target Frameworks**: .NET 9.0
+- **Target Framework**: .NET 9.0
 - **Author**: Panoramic Data Limited
 - **License**: MIT
 - **Repository**: https://github.com/panoramicdata/HaloPSA.Api
