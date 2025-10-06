@@ -27,7 +27,7 @@ internal sealed class AuthenticationHandler : DelegatingHandler
 
 		// Create a separate HttpClient for authentication requests
 		// This avoids circular dependencies with the main client
-		_authHttpClient = new HttpClient()
+		_authHttpClient = new HttpClient
 		{
 			BaseAddress = new Uri(_options.EffectiveBaseUrl),
 			Timeout = _options.RequestTimeout

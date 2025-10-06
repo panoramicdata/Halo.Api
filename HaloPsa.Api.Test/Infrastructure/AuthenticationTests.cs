@@ -2,7 +2,7 @@ using AwesomeAssertions;
 
 namespace HaloPsa.Api.Test.Infrastructure;
 
-public class AuthenticationTests()
+public class AuthenticationTests
 {
 	[Fact]
 	public void HaloClientOptions_WithValidCredentials_ValidatesSuccessfully()
@@ -61,7 +61,12 @@ public class AuthenticationTests()
 		public bool IsEnabled(LogLevel logLevel) => true;
 		public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
 		{
-			// Test logger implementation
+			// Test logger implementation - parameters are required by interface
+			_ = logLevel;
+			_ = eventId;
+			_ = state;
+			_ = exception;
+			_ = formatter;
 		}
 	}
 }

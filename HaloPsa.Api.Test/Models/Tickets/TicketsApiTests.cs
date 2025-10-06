@@ -185,7 +185,6 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		catch (InvalidOperationException)
 		{
 			// Skip test if we can't create tickets in this sandbox
-			return;
 		}
 	}
 
@@ -316,7 +315,6 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		catch (InvalidOperationException)
 		{
 			// Skip test if we can't create tickets in this sandbox
-			return;
 		}
 	}
 
@@ -417,7 +415,6 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		catch (InvalidOperationException)
 		{
 			// Skip test if we can't create tickets in this sandbox
-			return;
 		}
 	}
 
@@ -457,7 +454,6 @@ public class TicketsApiTests(IntegrationTestFixture fixture) : TestBase(fixture)
 		catch (InvalidOperationException)
 		{
 			// Skip test if we can't create tickets in this sandbox
-			return;
 		}
 	}
 

@@ -6,7 +6,7 @@ namespace HaloPsa.Api.Test;
 /// Simple command-line test to verify Halo API credentials and endpoints
 /// This class provides diagnostic utilities for testing API connectivity
 /// </summary>
-public class Program
+public static class Program
 {
 	// Note: Entry point removed to avoid conflict with test framework's auto-generated Main method
 	
