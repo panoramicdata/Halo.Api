@@ -2,7 +2,8 @@
 
 [![NuGet Version](https://img.shields.io/nuget/v/HaloPsa.Api)](https://www.nuget.org/packages/HaloPsa.Api)
 [![NuGet Downloads](https://img.shields.io/nuget/dt/HaloPsa.Api)](https://www.nuget.org/packages/HaloPsa.Api)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/a6c135d1c93d4d818e770f149385a149)](https://app.codacy.com/gh/panoramicdata/Halo.Api/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/panoramicdata/HaloPsa.Api/publish-nuget.yml)](https://github.com/panoramicdata/HaloPsa.Api/actions)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/a6c135d1c93d4d818e770f149385a149)](https://app.codacy.com/gh/panoramicdata/HaloPsa.Api/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A comprehensive, modern .NET library for interacting with the [Halo PSA](https://halopsa.com/) API. This library provides full coverage of the Halo PSA API with a clean, intuitive interface using modern C# patterns and best practices.
@@ -65,9 +66,9 @@ using HaloPsa.Api;
 
 var options = new HaloClientOptions
 {
-    HaloAccount = "your-account-name",        // e.g., "yourcompany" 
-    HaloClientId = "your-client-id-guid",     // Generated Client ID (GUID)
-    HaloClientSecret = "your-client-secret"   // Generated Client Secret (two concatenated GUIDs)
+    Account = "your-account-name",        // e.g., "yourcompany" 
+    ClientId = "your-client-id-guid",     // Generated Client ID (GUID)
+    ClientSecret = "your-client-secret"   // Generated Client Secret (two concatenated GUIDs)
 };
 
 var client = new HaloClient(options);
@@ -169,19 +170,16 @@ Console.WriteLine($"Contact: {clientDetails.MainContact?.Name}");
 ```csharp
 var options = new HaloClientOptions
 {
-    HaloAccount = "your-account",
-    HaloClientId = "your-client-id",
-    HaloClientSecret = "your-client-secret",
+    Account = "your-account",
+    ClientId = "your-client-id",
+    ClientSecret = "your-client-secret",
     
     // Custom timeout
     RequestTimeout = TimeSpan.FromSeconds(30),
     
     // Custom retry policy
     MaxRetryAttempts = 3,
-    RetryDelay = TimeSpan.FromSeconds(1),
-    
-    // Custom base URL (if using on-premises)
-    BaseUrl = "https://your-instance.halopsa.com"
+    RetryDelay = TimeSpan.FromSeconds(1)
 };
 
 var client = new HaloClient(options);
@@ -221,7 +219,6 @@ If you're experiencing authentication issues:
 4. **Validate Client Secret Format**: Ensure the Client Secret is in the correct format (two concatenated GUIDs)
 5. **Check Permissions**: Verify your API application has the necessary permissions/scopes
 6. **Network Connectivity**: Ensure your application can reach the Halo API endpoints
-7. **On-Premise vs Cloud**: On-premise installations may require custom BaseUrl configuration
 
 ### 5. Pagination and Large Result Sets
 
@@ -306,12 +303,11 @@ The `HaloClientOptions` class provides extensive configuration:
 public class HaloClientOptions
 {
     // Required authentication
-    public required string HaloAccount { get; init; }
-    public required string HaloClientId { get; init; }
-    public required string HaloClientSecret { get; init; }
+    public required string Account { get; init; }
+    public required string ClientId { get; init; }
+    public required string ClientSecret { get; init; }
     
     // Optional configuration
-    public string? BaseUrl { get; init; } = null;  // Uses default Halo cloud URL
     public TimeSpan RequestTimeout { get; init; } = TimeSpan.FromSeconds(30);
     public int MaxRetryAttempts { get; init; } = 3;
     public TimeSpan RetryDelay { get; init; } = TimeSpan.FromSeconds(1);
@@ -320,7 +316,7 @@ public class HaloClientOptions
     // Advanced options
     public bool EnableRequestLogging { get; init; } = false;
     public bool EnableResponseLogging { get; init; } = false;
-    public Dictionary<string, string> DefaultHeaders { get; init; } = [];
+    public IReadOnlyDictionary<string, string> DefaultHeaders { get; init; } = new Dictionary<string, string>();
     public bool UseExponentialBackoff { get; init; } = true;
     public TimeSpan MaxRetryDelay { get; init; } = TimeSpan.FromSeconds(30);
 }
@@ -342,8 +338,8 @@ We welcome contributions from the community! Here's how you can help:
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/panoramicdata/HaloPSA.Api.git
-   cd HaloPSA.Api
+   git clone https://github.com/panoramicdata/HaloPsa.Api.git
+   cd HaloPsa.Api
    ```
 
 2. **Install .NET 9 SDK**:
@@ -351,11 +347,11 @@ We welcome contributions from the community! Here's how you can help:
 
 3. **Set up User Secrets for testing**:
    ```bash
-   cd Halo.Api.Test
+   cd HaloPsa.Api.Test
    dotnet user-secrets init
-   dotnet user-secrets set "HaloApi:HaloAccount" "your-test-account"
-   dotnet user-secrets set "HaloApi:HaloClientId" "your-test-client-id"
-   dotnet user-secrets set "HaloApi:HaloClientSecret" "your-test-client-secret"
+   dotnet user-secrets set "HaloApi:Account" "your-test-account"
+   dotnet user-secrets set "HaloApi:ClientId" "your-test-client-id"
+   dotnet user-secrets set "HaloApi:ClientSecret" "your-test-client-secret"
    ```
 
 4. **Build and test**:
@@ -401,8 +397,8 @@ When reporting issues:
 ## Support
 
 - **Official Documentation**: [Halo API Docs](https://halo.haloservicedesk.com/apidoc/info)
-- **GitHub Issues**: [Report Issues](https://github.com/panoramicdata/HaloPSA.Api/issues)
-- **GitHub Discussions**: [Community Support](https://github.com/panoramicdata/HaloPSA.Api/discussions)
+- **GitHub Issues**: [Report Issues](https://github.com/panoramicdata/HaloPsa.Api/issues)
+- **GitHub Discussions**: [Community Support](https://github.com/panoramicdata/HaloPsa.Api/discussions)
 - **Halo Support**: Contact Halo Service Desk for API access and account issues
 
 ## License
